@@ -1,0 +1,422 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #3c2836;
+  --muted: #77636f;
+  --rose: #e93275;
+  --rose-dark: #ca245f;
+  --powder-pink: #f5a6bd;
+  --card: rgba(255, 253, 255, 0.88);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 280px;
+  background: #f8c4c6;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  color: var(--ink);
+  background: #f8c4c6;
+  font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
+  text-rendering: optimizeLegibility;
+}
+
+button {
+  font: inherit;
+}
+
+.valentine-page {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  min-height: 100svh;
+  place-items: center;
+  overflow: hidden;
+  padding: clamp(20px, 5vw, 64px) 16px;
+  background:
+    linear-gradient(rgba(255, 228, 230, 0.12), rgba(248, 176, 182, 0.22)),
+    url("/valentine-watercolor-bg.png") center / cover no-repeat;
+}
+
+.background-glow {
+  position: absolute;
+  z-index: -1;
+  width: min(720px, 90vw);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgba(255, 248, 246, 0.35);
+  filter: blur(60px);
+}
+
+.proposal-card {
+  position: relative;
+  display: flex;
+  width: min(480px, calc(100vw - 32px));
+  min-height: 610px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(38px, 6vh, 58px) clamp(26px, 7vw, 56px) 32px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: clamp(26px, 5vw, 36px);
+  background: var(--card);
+  box-shadow:
+    0 30px 80px rgba(130, 52, 75, 0.2),
+    0 8px 24px rgba(126, 61, 79, 0.11),
+    inset 0 1px 0 rgba(255, 255, 255, 0.86);
+  text-align: center;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.proposal-card::before,
+.proposal-card::after {
+  position: absolute;
+  color: rgba(234, 95, 130, 0.09);
+  font-family: Georgia, "Times New Roman", serif;
+  content: "♥";
+  pointer-events: none;
+}
+
+.proposal-card::before {
+  top: -42px;
+  right: -18px;
+  font-size: 150px;
+  rotate: 14deg;
+}
+
+.proposal-card::after {
+  bottom: -38px;
+  left: -12px;
+  font-size: 120px;
+  rotate: -20deg;
+}
+
+.portrait-shell {
+  position: relative;
+  width: clamp(104px, 26vw, 132px);
+  aspect-ratio: 1;
+  margin-bottom: 25px;
+  padding: 5px;
+  border-radius: 28px;
+  background: linear-gradient(145deg, #f6d3c6, #bd825b);
+  box-shadow:
+    0 13px 30px rgba(118, 69, 58, 0.18),
+    0 2px 8px rgba(90, 55, 49, 0.12);
+}
+
+.kitten-portrait {
+  width: 100%;
+  height: 100%;
+  border-radius: 23px;
+  object-fit: cover;
+}
+
+.portrait-heart {
+  position: absolute;
+  right: -12px;
+  bottom: -9px;
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 3px solid rgba(255, 255, 255, 0.92);
+  border-radius: 50%;
+  color: white;
+  background: linear-gradient(145deg, #f56c98, #dc2d69);
+  box-shadow: 0 6px 16px rgba(205, 47, 101, 0.25);
+  font-size: 16px;
+}
+
+.copy-block {
+  position: relative;
+  z-index: 1;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: #c65c7c;
+  font-size: 0.69rem;
+  font-weight: 700;
+  letter-spacing: 0.19em;
+  text-transform: uppercase;
+}
+
+h1 {
+  max-width: 330px;
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2.15rem, 8vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 0.99;
+  text-wrap: balance;
+}
+
+.supporting-copy {
+  margin: 17px 0 0;
+  color: var(--muted);
+  font-size: clamp(0.88rem, 3.2vw, 1rem);
+  letter-spacing: -0.01em;
+}
+
+.button-group {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-top: 32px;
+}
+
+.yes-button,
+.no-button {
+  cursor: default;
+  border: 0;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+.yes-button {
+  display: inline-flex;
+  width: min(230px, 100%);
+  min-height: 62px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 999px;
+  color: #fff;
+  background: linear-gradient(135deg, #f24d7f 0%, #e91f75 100%);
+  box-shadow:
+    0 15px 28px rgba(217, 39, 105, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.button-sparkles {
+  font-size: 0.96rem;
+}
+
+.no-button {
+  min-width: 92px;
+  min-height: 46px;
+  padding: 0 25px;
+  border: 1.5px solid #e1a4b6;
+  border-radius: 999px;
+  color: #b57589;
+  background: rgba(255, 255, 255, 0.58);
+  box-shadow: 0 7px 14px rgba(117, 64, 78, 0.08);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.yes-button:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 18px 32px rgba(217, 39, 105, 0.31),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
+.no-button:hover {
+  transform: translateY(-1px);
+  color: #a55770;
+  background: rgba(255, 255, 255, 0.84);
+}
+
+.yes-button:focus-visible,
+.no-button:focus-visible {
+  outline: 3px solid rgba(128, 48, 80, 0.36);
+  outline-offset: 4px;
+}
+
+.card-note {
+  position: absolute;
+  right: 0;
+  bottom: 13px;
+  left: 0;
+  margin: 0;
+  color: rgba(104, 68, 87, 0.36);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.7rem;
+  font-style: italic;
+}
+
+.decorations {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+}
+
+.heart,
+.sparkle {
+  position: absolute;
+  display: block;
+  color: rgba(224, 65, 107, 0.42);
+  filter: drop-shadow(0 5px 9px rgba(200, 63, 98, 0.12));
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.heart-one {
+  top: 10%;
+  left: 14%;
+  font-size: clamp(22px, 4vw, 46px);
+  rotate: -15deg;
+}
+
+.heart-two {
+  top: 24%;
+  right: 11%;
+  color: rgba(240, 111, 133, 0.33);
+  font-size: clamp(19px, 3vw, 34px);
+  rotate: 13deg;
+}
+
+.heart-three {
+  bottom: 13%;
+  left: 11%;
+  color: rgba(228, 80, 109, 0.29);
+  font-size: clamp(28px, 5vw, 60px);
+  rotate: 10deg;
+}
+
+.heart-four {
+  right: 13%;
+  bottom: 9%;
+  color: rgba(245, 114, 135, 0.25);
+  font-size: clamp(18px, 3vw, 36px);
+  rotate: -12deg;
+}
+
+.sparkle {
+  color: rgba(255, 250, 220, 0.85);
+  font-family: inherit;
+  text-shadow: 0 0 14px rgba(255, 245, 190, 0.8);
+}
+
+.sparkle-one {
+  top: 14%;
+  right: 23%;
+  font-size: 20px;
+}
+
+.sparkle-two {
+  bottom: 23%;
+  left: 22%;
+  font-size: 13px;
+}
+
+.sparkle-three {
+  top: 46%;
+  left: 8%;
+  font-size: 10px;
+}
+
+@media (max-width: 520px) {
+  .valentine-page {
+    padding: 18px 14px;
+  }
+
+  .proposal-card {
+    width: min(100%, 420px);
+    min-height: min(650px, calc(100svh - 36px));
+    padding-right: 24px;
+    padding-left: 24px;
+    border-radius: 28px;
+  }
+
+  .heart-one {
+    top: 5%;
+    left: 5%;
+  }
+
+  .heart-two {
+    top: 18%;
+    right: 3%;
+  }
+
+  .heart-three {
+    bottom: 5%;
+    left: 3%;
+  }
+
+  .heart-four {
+    right: 4%;
+    bottom: 18%;
+  }
+}
+
+@media (max-height: 690px) {
+  .valentine-page {
+    overflow-y: auto;
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+
+  .proposal-card {
+    min-height: min(580px, calc(100svh - 28px));
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
+
+  .portrait-shell {
+    width: 92px;
+    margin-bottom: 16px;
+    border-radius: 22px;
+  }
+
+  .kitten-portrait {
+    border-radius: 18px;
+  }
+
+  .eyebrow {
+    margin-bottom: 7px;
+    font-size: 0.63rem;
+  }
+
+  h1 {
+    font-size: clamp(1.85rem, 7vh, 2.4rem);
+  }
+
+  .supporting-copy {
+    margin-top: 12px;
+  }
+
+  .button-group {
+    gap: 10px;
+    margin-top: 21px;
+  }
+
+  .yes-button {
+    min-height: 52px;
+  }
+
+  .no-button {
+    min-height: 40px;
+  }
+
+  .card-note {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
