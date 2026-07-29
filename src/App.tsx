@@ -1,11 +1,9 @@
 import {
   useCallback,
   useEffect,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState,
-  type ReactNode,
   type RefObject,
 } from "react";
 import {
@@ -60,19 +58,18 @@ type ScheduleChoice = {
 };
 
 const modalLayoutTransition = {
-  type: "spring",
-  stiffness: 250,
-  damping: 30,
-  mass: 0.9,
+  type: "tween",
+  duration: 0.42,
+  ease: [0.22, 1, 0.36, 1],
 } satisfies Transition;
 
 const screenFadeTransition = {
-  duration: 0.48,
+  duration: 0.34,
   ease: [0.22, 1, 0.36, 1],
 } satisfies Transition;
 
 const contentTransition = {
-  duration: 0.32,
+  duration: 0.22,
   ease: [0.22, 1, 0.36, 1],
 } satisfies Transition;
 
@@ -766,38 +763,12 @@ function ScreenDecorations({ screen }: { screen: Screen }) {
   );
 }
 
-function MeasuredModalContent({
-  screen,
-  children,
-  onTransitionComplete,
-}: {
-  screen: Screen;
-  children: ReactNode;
-  onTransitionComplete: () => void;
-}) {
-  return (
-    <motion.div
-      className="modal-content-stage"
-      data-screen={screen}
-      initial={{ opacity: 0, y: 14 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      transition={contentTransition}
-      onAnimationComplete={onTransitionComplete}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
 export default function App() {
   const [screen, setScreen] = useState<Screen>("question");
   const [scheduleChoice, setScheduleChoice] = useState<ScheduleChoice | null>(
     null,
   );
   const [foodChoices, setFoodChoices] = useState<string[]>([]);
-  const [modalHeight, setModalHeight] = useState<number | null>(null);
-  const [isModalMeasured, setIsModalMeasured] = useState(false);
   const modalRef = useRef<HTMLElement>(null);
   const activeTransitionRef = useRef(false);
 
@@ -835,54 +806,6 @@ export default function App() {
     },
     [],
   );
-
-  useLayoutEffect(() => {
-    const modal = modalRef.current;
-    const viewport = modal?.closest<HTMLElement>(".modal-viewport");
-    const content = modal?.querySelector<HTMLElement>(
-      `.modal-content-stage[data-screen="${screen}"]`,
-    );
-
-    if (!modal || !viewport || !content) {
-      return;
-    }
-
-    const reportHeight = () => {
-      const modalStyles = getComputedStyle(modal);
-      const viewportStyles = getComputedStyle(viewport);
-      const toPixels = (value: string) => Number.parseFloat(value) || 0;
-      const modalBorderHeight =
-        toPixels(modalStyles.borderTopWidth) +
-        toPixels(modalStyles.borderBottomWidth);
-      const availableHeight =
-        viewport.clientHeight -
-        toPixels(viewportStyles.paddingTop) -
-        toPixels(viewportStyles.paddingBottom);
-      const nextHeight = Math.min(
-        content.offsetHeight + modalBorderHeight,
-        availableHeight,
-      );
-
-      if (nextHeight <= 0) {
-        return;
-      }
-
-      if (!isModalMeasured) {
-        modal.style.height = `${nextHeight}px`;
-        setIsModalMeasured(true);
-      }
-
-      setModalHeight(nextHeight);
-    };
-
-    reportHeight();
-
-    const observer = new ResizeObserver(reportHeight);
-    observer.observe(content);
-    observer.observe(viewport);
-
-    return () => observer.disconnect();
-  }, [isModalMeasured, screen]);
 
   const currentPresentation = screenPresentation[screen];
 
@@ -929,23 +852,28 @@ export default function App() {
         <main className="modal-viewport" data-screen={screen}>
           <motion.section
             ref={modalRef}
+            layout
             className={`persistent-modal ${currentPresentation.cardClass}`}
             aria-labelledby={currentPresentation.labelledBy}
-            data-measured={isModalMeasured}
             initial={false}
-            animate={modalHeight === null ? undefined : { height: modalHeight }}
-            transition={{ height: modalLayoutTransition }}
+            transition={{ layout: modalLayoutTransition }}
           >
-            <AnimatePresence initial={false} mode="sync">
-              <MeasuredModalContent
+            <AnimatePresence initial={false} mode="popLayout">
+              <motion.div
+                layout="position"
                 key={screen}
-                screen={screen}
-                onTransitionComplete={() => {
+                className="modal-content-stage"
+                data-screen={screen}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={contentTransition}
+                onAnimationComplete={() => {
                   activeTransitionRef.current = false;
                 }}
               >
                 {currentContent}
-              </MeasuredModalContent>
+              </motion.div>
             </AnimatePresence>
           </motion.section>
         </main>
