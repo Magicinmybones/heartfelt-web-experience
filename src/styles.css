@@ -104,10 +104,19 @@ button {
     url("/food-watercolor-bg.png") center / cover fixed no-repeat;
 }
 
+.final-page {
+  min-height: 0;
+  overflow: hidden;
+  background:
+    linear-gradient(rgba(255, 243, 246, 0.1), rgba(242, 185, 203, 0.16)),
+    url("/celebration-watercolor-bg.png") center / cover fixed no-repeat;
+}
+
 .background-glow,
 .celebration-glow,
 .schedule-glow,
-.food-glow {
+.food-glow,
+.final-glow {
   position: absolute;
   z-index: -1;
   width: min(720px, 90vw);
@@ -132,6 +141,12 @@ button {
   position: fixed;
   background: rgba(255, 250, 235, 0.46);
   filter: blur(76px);
+}
+
+.final-glow {
+  position: fixed;
+  background: rgba(255, 250, 245, 0.52);
+  filter: blur(78px);
 }
 
 .proposal-card {
@@ -189,7 +204,8 @@ button {
 }
 
 .schedule-card,
-.food-card {
+.food-card,
+.final-card {
   position: relative;
   display: flex;
   width: min(590px, calc(100vw - 32px));
@@ -227,15 +243,28 @@ button {
     inset 0 1px 0 rgba(255, 255, 255, 0.96);
 }
 
+.final-card {
+  width: min(600px, calc(100vw - 32px));
+  padding: clamp(30px, 5vw, 46px) clamp(24px, 6vw, 54px) 24px;
+  border-color: rgba(255, 255, 255, 0.86);
+  background: rgba(255, 253, 255, 0.92);
+  box-shadow:
+    0 34px 94px rgba(130, 52, 75, 0.2),
+    0 8px 26px rgba(126, 61, 79, 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96);
+}
+
 .schedule-card::-webkit-scrollbar,
 .proposal-card::-webkit-scrollbar,
-.food-card::-webkit-scrollbar {
+.food-card::-webkit-scrollbar,
+.final-card::-webkit-scrollbar {
   width: 10px;
 }
 
 .schedule-card::-webkit-scrollbar-track,
 .proposal-card::-webkit-scrollbar-track,
-.food-card::-webkit-scrollbar-track {
+.food-card::-webkit-scrollbar-track,
+.final-card::-webkit-scrollbar-track {
   margin-block: 22px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.14);
@@ -243,7 +272,8 @@ button {
 
 .schedule-card::-webkit-scrollbar-thumb,
 .proposal-card::-webkit-scrollbar-thumb,
-.food-card::-webkit-scrollbar-thumb {
+.food-card::-webkit-scrollbar-thumb,
+.final-card::-webkit-scrollbar-thumb {
   min-height: 52px;
   border: 3px solid transparent;
   border-radius: 999px;
@@ -253,19 +283,22 @@ button {
 
 .schedule-card::-webkit-scrollbar-thumb:hover,
 .proposal-card::-webkit-scrollbar-thumb:hover,
-.food-card::-webkit-scrollbar-thumb:hover {
+.food-card::-webkit-scrollbar-thumb:hover,
+.final-card::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, #ed5f8b, #c8215c);
   background-clip: padding-box;
 }
 
 .schedule-card::-webkit-scrollbar-corner,
 .proposal-card::-webkit-scrollbar-corner,
-.food-card::-webkit-scrollbar-corner {
+.food-card::-webkit-scrollbar-corner,
+.final-card::-webkit-scrollbar-corner {
   background: transparent;
 }
 
 .schedule-card::before,
-.food-card::before {
+.food-card::before,
+.final-card::before {
   position: absolute;
   top: -52px;
   right: -30px;
@@ -281,6 +314,14 @@ button {
   color: rgba(234, 95, 130, 0.065);
   font-size: 160px;
   rotate: -10deg;
+}
+
+.final-card::before {
+  top: -46px;
+  right: -26px;
+  color: rgba(234, 95, 130, 0.06);
+  font-size: 165px;
+  rotate: 9deg;
 }
 
 .schedule-header {
@@ -705,6 +746,241 @@ button {
   font-style: italic;
 }
 
+.final-confetti {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+}
+
+.final-confetti span {
+  position: absolute;
+  color: rgba(230, 61, 113, 0.34);
+  filter: drop-shadow(0 5px 9px rgba(200, 63, 98, 0.11));
+  animation: confetti-float 4.4s ease-in-out infinite;
+}
+
+.final-confetti span:nth-child(1) {
+  top: 13%;
+  left: 12%;
+  color: rgba(238, 171, 47, 0.55);
+  font-size: 24px;
+}
+
+.final-confetti span:nth-child(2) {
+  top: 22%;
+  right: 10%;
+  font-size: 31px;
+  animation-delay: 700ms;
+}
+
+.final-confetti span:nth-child(3) {
+  right: 15%;
+  bottom: 13%;
+  color: rgba(153, 93, 195, 0.4);
+  font-size: 26px;
+  animation-delay: 1.3s;
+}
+
+.final-confetti span:nth-child(4) {
+  bottom: 18%;
+  left: 11%;
+  font-size: 24px;
+  animation-delay: 1.9s;
+}
+
+.final-hero {
+  position: relative;
+  z-index: 1;
+  width: clamp(116px, 29vw, 150px);
+  aspect-ratio: 1;
+  padding: 5px;
+  border-radius: 30px;
+  background: linear-gradient(145deg, #fff0df, #dc9a74);
+  box-shadow:
+    0 16px 36px rgba(138, 75, 57, 0.19),
+    0 2px 8px rgba(90, 55, 49, 0.1);
+}
+
+.final-hero img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 25px;
+  object-fit: cover;
+}
+
+.final-hero > span {
+  position: absolute;
+  right: -13px;
+  bottom: -9px;
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border: 3px solid rgba(255, 255, 255, 0.94);
+  border-radius: 50%;
+  background: linear-gradient(145deg, #f9799d, #dc2c70);
+  box-shadow: 0 7px 17px rgba(201, 45, 99, 0.24);
+  font-size: 17px;
+}
+
+.final-header {
+  position: relative;
+  z-index: 1;
+  margin-top: 24px;
+}
+
+.final-header h1 {
+  max-width: 430px;
+  font-size: clamp(2.15rem, 7vw, 2.9rem);
+}
+
+.final-compliment {
+  margin: 13px 0 0;
+  color: #674956;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1rem, 3.6vw, 1.18rem);
+  font-style: italic;
+}
+
+.final-compliment span {
+  font-style: normal;
+}
+
+.final-subtitle {
+  max-width: 420px;
+  margin: 10px auto 0;
+  color: var(--muted);
+  font-size: clamp(0.8rem, 2.8vw, 0.92rem);
+  line-height: 1.55;
+}
+
+.date-receipt {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  margin-top: 26px;
+  padding: 22px 24px;
+  border: 1px solid rgba(158, 108, 129, 0.15);
+  border-radius: 23px;
+  background:
+    linear-gradient(145deg, rgba(255, 245, 249, 0.8), rgba(250, 238, 245, 0.64));
+  box-shadow:
+    0 12px 30px rgba(115, 67, 88, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.86);
+  text-align: left;
+}
+
+.receipt-section p {
+  margin: 0;
+}
+
+.receipt-label {
+  color: #c64a74;
+  font-size: 0.67rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.receipt-label span {
+  margin-right: 6px;
+  color: #e17298;
+  letter-spacing: 0.08em;
+}
+
+.receipt-value {
+  margin-top: 9px !important;
+  color: #bd3f69;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.receipt-detail {
+  margin-top: 4px !important;
+  color: #65505b;
+  font-size: 0.86rem;
+}
+
+.receipt-divider {
+  height: 1px;
+  margin: 18px 0;
+  background: linear-gradient(
+    90deg,
+    rgba(205, 96, 135, 0.22),
+    rgba(205, 96, 135, 0.05)
+  );
+}
+
+.receipt-foods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 11px;
+}
+
+.receipt-food {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border: 1px solid rgba(211, 83, 129, 0.15);
+  border-radius: 999px;
+  color: #684d5b;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 4px 10px rgba(118, 66, 86, 0.05);
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.approval-cat-shell {
+  position: relative;
+  z-index: 1;
+  width: 84px;
+  aspect-ratio: 1;
+  margin-top: 24px;
+  padding: 4px;
+  border-radius: 23px;
+  background: linear-gradient(145deg, #ffe9cf, #e69662);
+  box-shadow: 0 12px 27px rgba(138, 75, 57, 0.15);
+}
+
+.approval-cat-shell img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 19px;
+  object-fit: cover;
+}
+
+.final-note {
+  position: relative;
+  z-index: 1;
+  margin: 14px 0 0;
+  color: #8b7280;
+  font-size: 0.77rem;
+  line-height: 1.5;
+}
+
+.final-signoff {
+  position: relative;
+  z-index: 1;
+  margin: 20px 0 0;
+  padding-top: 16px;
+  color: rgba(107, 72, 88, 0.44);
+  border-top: 1px solid rgba(159, 108, 129, 0.12);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.69rem;
+  font-style: italic;
+}
+
+.final-signoff span {
+  color: rgba(214, 48, 104, 0.7);
+}
+
 .portrait-shell {
   position: relative;
   width: clamp(104px, 26vw, 132px);
@@ -1118,6 +1394,11 @@ h1 {
     background-attachment: scroll;
   }
 
+  .final-page {
+    padding: 16px 12px;
+    background-attachment: scroll;
+  }
+
   .schedule-card {
     width: min(100%, 430px);
     padding: 30px 17px 22px;
@@ -1128,6 +1409,27 @@ h1 {
     width: min(100%, 440px);
     padding: 27px 17px 21px;
     border-radius: 28px;
+  }
+
+  .final-card {
+    width: min(100%, 440px);
+    padding: 27px 17px 20px;
+    border-radius: 28px;
+  }
+
+  .final-hero {
+    width: 108px;
+    border-radius: 25px;
+  }
+
+  .final-hero img {
+    border-radius: 20px;
+  }
+
+  .date-receipt {
+    margin-top: 22px;
+    padding: 19px 17px;
+    border-radius: 20px;
   }
 
   .food-portrait-shell {

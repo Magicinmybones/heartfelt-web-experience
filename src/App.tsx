@@ -37,7 +37,12 @@ const foodOptions = [
   { name: "Ramen", emoji: "🍜", note: "cozy bowl moment" },
 ];
 
-type Screen = "question" | "celebration" | "schedule" | "food";
+type Screen = "question" | "celebration" | "schedule" | "food" | "final";
+
+type ScheduleChoice = {
+  date: Date;
+  time: string;
+};
 
 function QuestionScreen({ onYes }: { onYes: () => void }) {
   const cardRef = useRef<HTMLElement>(null);
@@ -275,7 +280,11 @@ function CelebrationScreen({ onContinue }: { onContinue: () => void }) {
   );
 }
 
-function ScheduleScreen({ onContinue }: { onContinue: () => void }) {
+function ScheduleScreen({
+  onContinue,
+}: {
+  onContinue: (choice: ScheduleChoice) => void;
+}) {
   const today = useMemo(() => {
     const date = new Date();
     date.setHours(0, 0, 0, 0);
@@ -424,7 +433,11 @@ function ScheduleScreen({ onContinue }: { onContinue: () => void }) {
           className="yes-button schedule-button"
           type="button"
           disabled={!selectionComplete}
-          onClick={onContinue}
+          onClick={() => {
+            if (selectedDate) {
+              onContinue({ date: selectedDate, time: selectedTime });
+            }
+          }}
         >
           Okay, next →
         </button>
@@ -439,9 +452,12 @@ function ScheduleScreen({ onContinue }: { onContinue: () => void }) {
   );
 }
 
-function FoodScreen() {
+function FoodScreen({
+  onContinue,
+}: {
+  onContinue: (foods: string[]) => void;
+}) {
   const [selectedFoods, setSelectedFoods] = useState<string[]>([]);
-  const [submitted, setSubmitted] = useState(false);
 
   const toggleFood = (food: string) => {
     setSelectedFoods((current) =>
@@ -449,7 +465,6 @@ function FoodScreen() {
         ? current.filter((item) => item !== food)
         : [...current, food],
     );
-    setSubmitted(false);
   };
 
   return (
@@ -502,20 +517,121 @@ function FoodScreen() {
         </div>
 
         <button
-          className={`yes-button food-submit${submitted ? " is-confirmed" : ""}`}
+          className="yes-button food-submit"
           type="button"
           disabled={selectedFoods.length === 0}
-          onClick={() => setSubmitted(true)}
+          onClick={() => onContinue(selectedFoods)}
         >
-          {submitted ? "Excellent choices! 💖" : "This one!! 🎉"}
+          This one!! 🎉
         </button>
 
-        <p className="food-status" aria-live="polite">
-          {submitted
-            ? `Perfect — ${selectedFoods.join(", ")} it is!`
-            : selectedFoods.length > 0
-              ? `${selectedFoods.length} selected`
-              : "\u00A0"}
+        <p className="food-status">
+          {selectedFoods.length > 0
+            ? `${selectedFoods.length} selected`
+            : "\u00A0"}
+        </p>
+      </section>
+    </main>
+  );
+}
+
+function FinalScreen({
+  schedule,
+  foods,
+}: {
+  schedule: ScheduleChoice;
+  foods: string[];
+}) {
+  const dayName = schedule.date.toLocaleDateString(undefined, {
+    weekday: "long",
+  });
+  const fullDate = schedule.date.toLocaleDateString(undefined, {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+
+  return (
+    <main className="valentine-page final-page">
+      <div className="final-glow" aria-hidden="true" />
+      <div className="final-confetti" aria-hidden="true">
+        <span>✦</span>
+        <span>♥</span>
+        <span>✧</span>
+        <span>♥</span>
+      </div>
+
+      <section className="final-card" aria-labelledby="final-title">
+        <div className="final-hero">
+          <img
+            src="/final-cuddle-cats.png"
+            alt="Two cats cuddling with their tails forming a heart"
+            width="150"
+            height="150"
+          />
+          <span aria-hidden="true">💞</span>
+        </div>
+
+        <header className="final-header">
+          <p className="eyebrow">Officially official</p>
+          <h1 id="final-title">It’s a date.</h1>
+          <p className="final-compliment">
+            I’ll be the happiest person you’ve ever seen <span>✨</span>
+          </p>
+          <p className="final-subtitle">
+            You can’t cancel btw — the cats have already been informed.
+          </p>
+        </header>
+
+        <div className="date-receipt" aria-label="Your date plan">
+          <div className="receipt-section">
+            <p className="receipt-label">
+              <span aria-hidden="true">//</span> Date
+            </p>
+            <p className="receipt-value">{dayName}</p>
+            <p className="receipt-detail">{fullDate}</p>
+            <p className="receipt-detail">at {schedule.time}</p>
+          </div>
+
+          <div className="receipt-divider" aria-hidden="true" />
+
+          <div className="receipt-section">
+            <p className="receipt-label">
+              <span aria-hidden="true">//</span> Food
+            </p>
+            <div className="receipt-foods">
+              {foods.map((food) => {
+                const foodOption = foodOptions.find(
+                  (option) => option.name === food,
+                );
+
+                return (
+                  <span className="receipt-food" key={food}>
+                    <span aria-hidden="true">{foodOption?.emoji ?? "🍽️"}</span>
+                    {food}
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        <div className="approval-cat-shell">
+          <img
+            src="/final-approval-cat.png"
+            alt="An orange tabby giving an enthusiastic thumbs-up"
+            width="92"
+            height="92"
+          />
+        </div>
+
+        <p className="final-note">
+          p.s. this is officially production-ready, so there’s no taking it
+          back <span aria-hidden="true">💌</span>
+        </p>
+        <p className="final-signoff">
+          made with <span aria-hidden="true">♥</span> and excellent taste
         </p>
       </section>
     </main>
@@ -539,6 +655,9 @@ function BackgroundDecorations() {
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>("question");
+  const [scheduleChoice, setScheduleChoice] =
+    useState<ScheduleChoice | null>(null);
+  const [foodChoices, setFoodChoices] = useState<string[]>([]);
 
   return (
     <div className="app-shell" key={screen}>
@@ -549,9 +668,24 @@ export default function App() {
         <CelebrationScreen onContinue={() => setScreen("schedule")} />
       )}
       {screen === "schedule" && (
-        <ScheduleScreen onContinue={() => setScreen("food")} />
+        <ScheduleScreen
+          onContinue={(choice) => {
+            setScheduleChoice(choice);
+            setScreen("food");
+          }}
+        />
       )}
-      {screen === "food" && <FoodScreen />}
+      {screen === "food" && (
+        <FoodScreen
+          onContinue={(foods) => {
+            setFoodChoices(foods);
+            setScreen("final");
+          }}
+        />
+      )}
+      {screen === "final" && scheduleChoice && (
+        <FinalScreen schedule={scheduleChoice} foods={foodChoices} />
+      )}
     </div>
   );
 }
