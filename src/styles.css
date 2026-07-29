@@ -1,12 +1,14 @@
-@import "tailwindcss";
-
 :root {
   --ink: #3c2836;
   --muted: #77636f;
   --rose: #e93275;
   --rose-dark: #ca245f;
-  --powder-pink: #f5a6bd;
   --card: rgba(255, 253, 255, 0.88);
+  color: var(--ink);
+  background: #f8c4c6;
+  font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
 }
 
 * {
@@ -19,12 +21,10 @@ html {
 }
 
 body {
+  min-width: 280px;
   min-height: 100vh;
   margin: 0;
-  color: var(--ink);
   background: #f8c4c6;
-  font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
-  text-rendering: optimizeLegibility;
 }
 
 button {
@@ -42,6 +42,11 @@ button {
   border: 0;
 }
 
+.app-shell {
+  min-height: 100svh;
+  animation: screen-arrival 540ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
 .valentine-page {
   position: relative;
   isolation: isolate;
@@ -50,12 +55,22 @@ button {
   place-items: center;
   overflow: hidden;
   padding: clamp(20px, 5vw, 64px) 16px;
+}
+
+.question-page {
   background:
     linear-gradient(rgba(255, 228, 230, 0.12), rgba(248, 176, 182, 0.22)),
     url("/valentine-watercolor-bg.png") center / cover no-repeat;
 }
 
-.background-glow {
+.celebration-page {
+  background:
+    linear-gradient(rgba(255, 236, 232, 0.06), rgba(247, 173, 181, 0.12)),
+    url("/celebration-watercolor-bg.png") center / cover no-repeat;
+}
+
+.background-glow,
+.celebration-glow {
   position: absolute;
   z-index: -1;
   width: min(720px, 90vw);
@@ -63,6 +78,11 @@ button {
   border-radius: 50%;
   background: rgba(255, 248, 246, 0.35);
   filter: blur(60px);
+}
+
+.celebration-glow {
+  background: rgba(255, 250, 235, 0.48);
+  filter: blur(70px);
 }
 
 .proposal-card {
@@ -110,6 +130,15 @@ button {
   rotate: -20deg;
 }
 
+.celebration-card {
+  border-color: rgba(255, 255, 255, 0.82);
+  background: rgba(255, 253, 255, 0.91);
+  box-shadow:
+    0 34px 90px rgba(149, 61, 79, 0.22),
+    0 8px 24px rgba(126, 61, 79, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+}
+
 .portrait-shell {
   position: relative;
   width: clamp(104px, 26vw, 132px);
@@ -123,7 +152,15 @@ button {
     0 2px 8px rgba(90, 55, 49, 0.12);
 }
 
+.celebration-portrait-shell {
+  background: linear-gradient(145deg, #fff0c9, #eea548);
+  box-shadow:
+    0 15px 34px rgba(174, 99, 32, 0.21),
+    0 2px 8px rgba(90, 55, 49, 0.1);
+}
+
 .kitten-portrait {
+  display: block;
   width: 100%;
   height: 100%;
   border-radius: 23px;
@@ -146,6 +183,11 @@ button {
   font-size: 16px;
 }
 
+.celebration-badge {
+  background: linear-gradient(145deg, #ffb842, #ef6c5d);
+  box-shadow: 0 6px 16px rgba(220, 111, 36, 0.28);
+}
+
 .copy-block {
   position: relative;
   z-index: 1;
@@ -161,7 +203,7 @@ button {
 }
 
 h1 {
-  max-width: 330px;
+  max-width: 350px;
   margin: 0;
   font-family: Georgia, "Times New Roman", serif;
   font-size: clamp(2.15rem, 8vw, 3rem);
@@ -169,6 +211,10 @@ h1 {
   letter-spacing: -0.045em;
   line-height: 0.99;
   text-wrap: balance;
+}
+
+.celebration-card h1 {
+  font-size: clamp(2rem, 7.5vw, 2.75rem);
 }
 
 .supporting-copy {
@@ -275,6 +321,40 @@ h1 {
   outline-offset: 4px;
 }
 
+.celebration-emojis {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: clamp(16px, 5vw, 24px);
+  align-items: center;
+  justify-content: center;
+  margin-top: 25px;
+  font-size: clamp(1.45rem, 5vw, 1.85rem);
+}
+
+.celebration-emojis span {
+  filter: drop-shadow(0 4px 7px rgba(126, 60, 79, 0.12));
+  animation: emoji-bounce 2.5s ease-in-out infinite;
+}
+
+.celebration-emojis span:nth-child(2) {
+  animation-delay: 120ms;
+}
+
+.celebration-emojis span:nth-child(3) {
+  animation-delay: 240ms;
+}
+
+.celebration-emojis span:nth-child(4) {
+  animation-delay: 360ms;
+}
+
+.celebration-button {
+  position: relative;
+  z-index: 1;
+  margin-top: 29px;
+}
+
 .card-note {
   position: absolute;
   right: 0;
@@ -287,7 +367,8 @@ h1 {
   font-style: italic;
 }
 
-.decorations {
+.decorations,
+.confetti-layer {
   position: absolute;
   z-index: -1;
   inset: 0;
@@ -295,7 +376,8 @@ h1 {
 }
 
 .heart,
-.sparkle {
+.sparkle,
+.confetti {
   position: absolute;
   display: block;
   color: rgba(224, 65, 107, 0.42);
@@ -356,6 +438,91 @@ h1 {
   top: 46%;
   left: 8%;
   font-size: 10px;
+}
+
+.confetti {
+  font-family: inherit;
+  animation: confetti-float 4.6s ease-in-out infinite;
+}
+
+.confetti-one {
+  top: 10%;
+  left: 9%;
+  color: #ee4776;
+  font-size: 25px;
+  rotate: 18deg;
+}
+
+.confetti-two {
+  top: 22%;
+  right: 8%;
+  color: #f0a927;
+  font-size: 18px;
+  animation-delay: 500ms;
+}
+
+.confetti-three {
+  top: 7%;
+  right: 25%;
+  color: #9c57c7;
+  font-size: 32px;
+  animation-delay: 900ms;
+}
+
+.confetti-four {
+  bottom: 13%;
+  right: 12%;
+  color: #ed4169;
+  font-size: 24px;
+  rotate: -24deg;
+  animation-delay: 1.2s;
+}
+
+.confetti-five {
+  bottom: 20%;
+  left: 9%;
+  color: #e5a529;
+  font-size: 20px;
+  animation-delay: 1.7s;
+}
+
+.confetti-six {
+  bottom: 7%;
+  left: 23%;
+  color: #ad64c9;
+  font-size: 28px;
+  animation-delay: 2.1s;
+}
+
+@keyframes screen-arrival {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes emoji-bounce {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  50% {
+    transform: translateY(-6px) rotate(4deg);
+  }
+}
+
+@keyframes confetti-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  50% {
+    transform: translateY(-12px) rotate(12deg);
+  }
 }
 
 @media (max-width: 520px) {
@@ -424,6 +591,10 @@ h1 {
     font-size: clamp(1.85rem, 7vh, 2.4rem);
   }
 
+  .celebration-card h1 {
+    font-size: clamp(1.75rem, 6.4vh, 2.25rem);
+  }
+
   .supporting-copy {
     margin-top: 12px;
   }
@@ -441,6 +612,14 @@ h1 {
     min-height: 40px;
   }
 
+  .celebration-emojis {
+    margin-top: 17px;
+  }
+
+  .celebration-button {
+    margin-top: 20px;
+  }
+
   .card-note {
     display: none;
   }
@@ -451,6 +630,8 @@ h1 {
   *::before,
   *::after {
     scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
 }

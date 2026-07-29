@@ -1,6 +1,3 @@
-"use client";
-
-import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const decorations = [
@@ -21,7 +18,9 @@ const noReplies = [
   "Nope — catch me! 💨",
 ];
 
-export default function Home() {
+type Screen = "question" | "celebration";
+
+function QuestionScreen({ onYes }: { onYes: () => void }) {
   const cardRef = useRef<HTMLElement>(null);
   const yesButtonRef = useRef<HTMLButtonElement>(null);
   const noButtonRef = useRef<HTMLButtonElement>(null);
@@ -82,7 +81,6 @@ export default function Home() {
 
     const keepButtonInCard = () => moveNoButton();
     window.addEventListener("resize", keepButtonInCard);
-
     return () => window.removeEventListener("resize", keepButtonInCard);
   }, [isFloating, moveNoButton]);
 
@@ -114,16 +112,8 @@ export default function Home() {
   };
 
   return (
-    <main className="valentine-page">
-      <div className="background-glow" aria-hidden="true" />
-
-      <div className="decorations" aria-hidden="true">
-        {decorations.map((decoration) => (
-          <span className={decoration.className} key={decoration.className}>
-            {decoration.symbol}
-          </span>
-        ))}
-      </div>
+    <main className="valentine-page question-page">
+      <BackgroundDecorations />
 
       <section
         className="proposal-card"
@@ -131,12 +121,11 @@ export default function Home() {
         ref={cardRef}
       >
         <div className="portrait-shell">
-          <Image
+          <img
             src="/shy-kitten.png"
             alt="A tiny gray kitten raising its paw"
-            width={132}
-            height={132}
-            priority
+            width="132"
+            height="132"
             className="kitten-portrait"
           />
           <span className="portrait-heart" aria-hidden="true">
@@ -156,7 +145,12 @@ export default function Home() {
           className={`button-group${isFloating ? " is-floating" : ""}`}
           aria-label="Valentine response options"
         >
-          <button className="yes-button" type="button" ref={yesButtonRef}>
+          <button
+            className="yes-button"
+            type="button"
+            ref={yesButtonRef}
+            onClick={onYes}
+          >
             <span>Yes!</span>
             <span className="button-sparkles" aria-hidden="true">
               ✨
@@ -198,5 +192,91 @@ export default function Home() {
         </p>
       </section>
     </main>
+  );
+}
+
+function CelebrationScreen() {
+  return (
+    <main className="valentine-page celebration-page">
+      <div className="celebration-glow" aria-hidden="true" />
+      <div className="confetti-layer" aria-hidden="true">
+        <span className="confetti confetti-one">◆</span>
+        <span className="confetti confetti-two">●</span>
+        <span className="confetti confetti-three">★</span>
+        <span className="confetti confetti-four">◆</span>
+        <span className="confetti confetti-five">●</span>
+        <span className="confetti confetti-six">★</span>
+      </div>
+
+      <section
+        className="proposal-card celebration-card"
+        aria-labelledby="celebration-title"
+      >
+        <div className="portrait-shell celebration-portrait-shell">
+          <img
+            src="/celebration-cat.png"
+            alt="A delighted orange cat standing with both paws raised"
+            width="132"
+            height="132"
+            className="kitten-portrait"
+          />
+          <span className="portrait-heart celebration-badge" aria-hidden="true">
+            ✦
+          </span>
+        </div>
+
+        <div className="copy-block">
+          <p className="eyebrow">Plot twist!</p>
+          <h1 id="celebration-title">Wait… you actually said yes??</h1>
+          <p className="supporting-copy">
+            I was so ready for you to say no
+          </p>
+        </div>
+
+        <div className="celebration-emojis" aria-label="Celebration">
+          <span>🎉</span>
+          <span>💃</span>
+          <span>🥹</span>
+          <span>💖</span>
+        </div>
+
+        <button className="yes-button celebration-button" type="button">
+          Okay okay! <span aria-hidden="true">😊</span>
+        </button>
+
+        <p className="card-note" aria-hidden="true">
+          best answer ever
+        </p>
+      </section>
+    </main>
+  );
+}
+
+function BackgroundDecorations() {
+  return (
+    <>
+      <div className="background-glow" aria-hidden="true" />
+      <div className="decorations" aria-hidden="true">
+        {decorations.map((decoration) => (
+          <span className={decoration.className} key={decoration.className}>
+            {decoration.symbol}
+          </span>
+        ))}
+      </div>
+    </>
+  );
+}
+
+export default function App() {
+  const [screen, setScreen] = useState<Screen>("question");
+
+  return (
+    <div className="app-shell" key={screen}>
+      {screen === "question" ? (
+        <QuestionScreen onYes={() => setScreen("celebration")} />
+      ) : (
+        <CelebrationScreen />
+      )}
+    </div>
   );
 }
