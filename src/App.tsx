@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { flushSync } from "react-dom";
+import {
+  AnimatePresence,
+  LayoutGroup,
+  MotionConfig,
+  motion,
+  type Transition,
+} from "motion/react";
 
 const decorations = [
   { className: "heart heart-one", symbol: "♥" },
@@ -40,16 +46,22 @@ const foodOptions = [
 
 type Screen = "question" | "celebration" | "schedule" | "food" | "final";
 
-type ViewTransitionDocument = Document & {
-  startViewTransition?: (update: () => void) => {
-    finished: Promise<void>;
-  };
-};
-
 type ScheduleChoice = {
   date: Date;
   time: string;
 };
+
+const modalLayoutTransition = {
+  type: "spring",
+  stiffness: 250,
+  damping: 30,
+  mass: 0.9,
+} satisfies Transition;
+
+const screenFadeTransition = {
+  duration: 0.48,
+  ease: [0.22, 1, 0.36, 1],
+} satisfies Transition;
 
 const screenSequence: Screen[] = [
   "question",
@@ -186,7 +198,10 @@ function QuestionScreen({ onYes }: { onYes: () => void }) {
     <main className="valentine-page question-page">
       <BackgroundDecorations />
 
-      <section
+      <motion.section
+        layout
+        layoutId="valentine-modal"
+        transition={{ layout: modalLayoutTransition }}
         className="proposal-card"
         aria-labelledby="proposal-title"
         ref={cardRef}
@@ -277,7 +292,7 @@ function QuestionScreen({ onYes }: { onYes: () => void }) {
         <p className="card-note" aria-hidden="true">
           made with a whole lot of love
         </p>
-      </section>
+      </motion.section>
     </main>
   );
 }
@@ -295,7 +310,10 @@ function CelebrationScreen({ onContinue }: { onContinue: () => void }) {
         <span className="confetti confetti-six">★</span>
       </div>
 
-      <section
+      <motion.section
+        layout
+        layoutId="valentine-modal"
+        transition={{ layout: modalLayoutTransition }}
         className="proposal-card celebration-card"
         aria-labelledby="celebration-title"
       >
@@ -338,7 +356,7 @@ function CelebrationScreen({ onContinue }: { onContinue: () => void }) {
         <p className="card-note" aria-hidden="true">
           best answer ever
         </p>
-      </section>
+      </motion.section>
     </main>
   );
 }
@@ -391,7 +409,13 @@ function ScheduleScreen({
     <main className="valentine-page schedule-page">
       <div className="schedule-glow" aria-hidden="true" />
 
-      <section className="schedule-card" aria-labelledby="schedule-title">
+      <motion.section
+        layout
+        layoutId="valentine-modal"
+        transition={{ layout: modalLayoutTransition }}
+        className="schedule-card"
+        aria-labelledby="schedule-title"
+      >
         <header className="schedule-header">
           <p className="eyebrow">One tiny detail</p>
           <h1 id="schedule-title">So… when are you free?</h1>
@@ -510,7 +534,7 @@ function ScheduleScreen({
             ? `${formatDateLabel(selectedDate)} at ${selectedTime}`
             : "\u00A0"}
         </p>
-      </section>
+      </motion.section>
     </main>
   );
 }
@@ -534,7 +558,13 @@ function FoodScreen({
     <main className="valentine-page food-page">
       <div className="food-glow" aria-hidden="true" />
 
-      <section className="food-card" aria-labelledby="food-title">
+      <motion.section
+        layout
+        layoutId="valentine-modal"
+        transition={{ layout: modalLayoutTransition }}
+        className="food-card"
+        aria-labelledby="food-title"
+      >
         <div className="portrait-shell food-portrait-shell">
           <img
             src="/food-picker-cat.png"
@@ -593,7 +623,7 @@ function FoodScreen({
             ? `${selectedFoods.length} selected`
             : "\u00A0"}
         </p>
-      </section>
+      </motion.section>
     </main>
   );
 }
@@ -625,7 +655,13 @@ function FinalScreen({
         <span>♥</span>
       </div>
 
-      <section className="final-card" aria-labelledby="final-title">
+      <motion.section
+        layout
+        layoutId="valentine-modal"
+        transition={{ layout: modalLayoutTransition }}
+        className="final-card"
+        aria-labelledby="final-title"
+      >
         <div className="final-hero">
           <img
             src="/final-cuddle-cats.png"
@@ -696,7 +732,7 @@ function FinalScreen({
         <p className="final-signoff">
           made with <span aria-hidden="true">♥</span> and excellent taste
         </p>
-      </section>
+      </motion.section>
     </main>
   );
 }
@@ -724,19 +760,6 @@ export default function App() {
   const activeTransitionRef = useRef(false);
 
   useEffect(() => {
-    const transitionDocument = document as ViewTransitionDocument;
-
-    if (typeof transitionDocument.startViewTransition !== "function") {
-      return;
-    }
-
-    document.documentElement.classList.add("supports-view-transitions");
-    return () => {
-      document.documentElement.classList.remove("supports-view-transitions");
-    };
-  }, []);
-
-  useEffect(() => {
     const nextScreen = screenSequence[screenSequence.indexOf(screen) + 1];
 
     if (!nextScreen) {
@@ -760,69 +783,63 @@ export default function App() {
 
   const navigate = useCallback(
     (nextScreen: Screen, updateBeforeNavigation?: () => void) => {
-      const commitNavigation = () => {
-        updateBeforeNavigation?.();
-        setScreen(nextScreen);
-      };
-      const transitionDocument = document as ViewTransitionDocument;
-      const prefersReducedMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
-
-      if (
-        prefersReducedMotion ||
-        typeof transitionDocument.startViewTransition !== "function"
-      ) {
-        commitNavigation();
-        return;
-      }
-
       if (activeTransitionRef.current) {
         return;
       }
 
       activeTransitionRef.current = true;
-      document.documentElement.classList.add("is-screen-transitioning");
-
-      const transition = transitionDocument.startViewTransition(() => {
-        flushSync(commitNavigation);
-      });
-
-      const finishTransition = () => {
-        activeTransitionRef.current = false;
-        document.documentElement.classList.remove("is-screen-transitioning");
-      };
-
-      void transition.finished.then(finishTransition, finishTransition);
+      updateBeforeNavigation?.();
+      setScreen(nextScreen);
     },
     [],
   );
 
   return (
-    <div className="app-shell" key={screen}>
-      {screen === "question" && (
-        <QuestionScreen onYes={() => navigate("celebration")} />
-      )}
-      {screen === "celebration" && (
-        <CelebrationScreen onContinue={() => navigate("schedule")} />
-      )}
-      {screen === "schedule" && (
-        <ScheduleScreen
-          onContinue={(choice) => {
-            navigate("food", () => setScheduleChoice(choice));
-          }}
-        />
-      )}
-      {screen === "food" && (
-        <FoodScreen
-          onContinue={(foods) => {
-            navigate("final", () => setFoodChoices(foods));
-          }}
-        />
-      )}
-      {screen === "final" && scheduleChoice && (
-        <FinalScreen schedule={scheduleChoice} foods={foodChoices} />
-      )}
+    <div className="app-shell">
+      <MotionConfig reducedMotion="user">
+        <LayoutGroup id="valentine-flow">
+          <AnimatePresence initial={false} mode="sync">
+            <motion.div
+              className="screen-stage"
+              key={screen}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={screenFadeTransition}
+              onAnimationComplete={() => {
+                activeTransitionRef.current = false;
+              }}
+            >
+              {screen === "question" && (
+                <QuestionScreen onYes={() => navigate("celebration")} />
+              )}
+              {screen === "celebration" && (
+                <CelebrationScreen onContinue={() => navigate("schedule")} />
+              )}
+              {screen === "schedule" && (
+                <ScheduleScreen
+                  onContinue={(choice) => {
+                    navigate("food", () => setScheduleChoice(choice));
+                  }}
+                />
+              )}
+              {screen === "food" && (
+                <FoodScreen
+                  onContinue={(foods) => {
+                    navigate("final", () => setFoodChoices(foods));
+                  }}
+                />
+              )}
+              {screen === "final" && scheduleChoice && (
+                <FinalScreen
+                  schedule={scheduleChoice}
+                  foods={foodChoices}
+                />
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </LayoutGroup>
+      </MotionConfig>
     </div>
   );
 }
