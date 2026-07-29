@@ -31,6 +31,17 @@ button {
   font: inherit;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .valentine-page {
   position: relative;
   isolation: isolate;
@@ -180,12 +191,14 @@ h1 {
 
 .yes-button,
 .no-button {
-  cursor: default;
+  cursor: pointer;
   border: 0;
   transition:
     transform 180ms ease,
     box-shadow 180ms ease,
-    background 180ms ease;
+    background 180ms ease,
+    left 160ms ease,
+    top 160ms ease;
 }
 
 .yes-button {
@@ -210,6 +223,7 @@ h1 {
 }
 
 .no-button {
+  max-width: min(230px, 100%);
   min-width: 92px;
   min-height: 46px;
   padding: 0 25px;
@@ -220,6 +234,7 @@ h1 {
   box-shadow: 0 7px 14px rgba(117, 64, 78, 0.08);
   font-size: 0.9rem;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .yes-button:hover {
@@ -233,6 +248,22 @@ h1 {
   transform: translateY(-1px);
   color: #a55770;
   background: rgba(255, 255, 255, 0.84);
+}
+
+.button-group.is-evasive {
+  position: static;
+}
+
+.no-button.is-evasive {
+  position: absolute;
+  z-index: 5;
+  max-width: calc(100% - 32px);
+  cursor: not-allowed;
+  box-shadow: 0 10px 24px rgba(117, 64, 78, 0.17);
+}
+
+.no-button.is-evasive:hover {
+  transform: none;
 }
 
 .yes-button:focus-visible,
