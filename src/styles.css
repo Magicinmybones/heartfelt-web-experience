@@ -113,6 +113,10 @@ button {
   padding: var(--modal-padding);
 }
 
+.persistent-modal[data-measured="false"] .modal-content-stage {
+  position: relative;
+}
+
 .modal-content-stage[data-screen="question"],
 .modal-content-stage[data-screen="celebration"] {
   --modal-padding: clamp(38px, 6vh, 58px) clamp(26px, 7vw, 56px) 32px;
@@ -140,6 +144,11 @@ button {
   place-items: center;
   overflow: hidden;
   padding: clamp(20px, 5vw, 64px) 16px;
+}
+
+.screen-stage.valentine-page {
+  position: absolute;
+  inset: 0;
 }
 
 .question-page {

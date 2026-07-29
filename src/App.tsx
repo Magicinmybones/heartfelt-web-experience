@@ -769,51 +769,14 @@ function ScreenDecorations({ screen }: { screen: Screen }) {
 function MeasuredModalContent({
   screen,
   children,
-  onHeightReady,
   onTransitionComplete,
 }: {
   screen: Screen;
   children: ReactNode;
-  onHeightReady: (screen: Screen, height: number) => void;
   onTransitionComplete: () => void;
 }) {
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  useLayoutEffect(() => {
-    const content = contentRef.current;
-    const modal = content?.parentElement;
-    const viewport = content?.closest<HTMLElement>(".modal-viewport");
-
-    if (!content || !modal || !viewport) {
-      return;
-    }
-
-    const reportHeight = () => {
-      const modalStyles = getComputedStyle(modal);
-      const viewportStyles = getComputedStyle(viewport);
-      const modalBorderHeight =
-        Number.parseFloat(modalStyles.borderTopWidth) +
-        Number.parseFloat(modalStyles.borderBottomWidth);
-      const availableHeight =
-        viewport.clientHeight -
-        Number.parseFloat(viewportStyles.paddingTop) -
-        Number.parseFloat(viewportStyles.paddingBottom);
-      const contentHeight = content.offsetHeight + modalBorderHeight;
-
-      onHeightReady(screen, Math.min(contentHeight, availableHeight));
-    };
-    reportHeight();
-
-    const observer = new ResizeObserver(reportHeight);
-    observer.observe(content);
-    observer.observe(viewport);
-
-    return () => observer.disconnect();
-  }, [onHeightReady, screen]);
-
   return (
     <motion.div
-      ref={contentRef}
       className="modal-content-stage"
       data-screen={screen}
       initial={{ opacity: 0, y: 14 }}
@@ -834,11 +797,9 @@ export default function App() {
   );
   const [foodChoices, setFoodChoices] = useState<string[]>([]);
   const [modalHeight, setModalHeight] = useState<number | null>(null);
+  const [isModalMeasured, setIsModalMeasured] = useState(false);
   const modalRef = useRef<HTMLElement>(null);
-  const currentScreenRef = useRef(screen);
-  const measuredHeightRef = useRef<number | null>(null);
   const activeTransitionRef = useRef(false);
-  currentScreenRef.current = screen;
 
   useEffect(() => {
     const nextScreen = screenSequence[screenSequence.indexOf(screen) + 1];
@@ -875,21 +836,53 @@ export default function App() {
     [],
   );
 
-  const handleHeightReady = useCallback(
-    (measuredScreen: Screen, height: number) => {
-      if (measuredScreen !== currentScreenRef.current) {
+  useLayoutEffect(() => {
+    const modal = modalRef.current;
+    const viewport = modal?.closest<HTMLElement>(".modal-viewport");
+    const content = modal?.querySelector<HTMLElement>(
+      `.modal-content-stage[data-screen="${screen}"]`,
+    );
+
+    if (!modal || !viewport || !content) {
+      return;
+    }
+
+    const reportHeight = () => {
+      const modalStyles = getComputedStyle(modal);
+      const viewportStyles = getComputedStyle(viewport);
+      const toPixels = (value: string) => Number.parseFloat(value) || 0;
+      const modalBorderHeight =
+        toPixels(modalStyles.borderTopWidth) +
+        toPixels(modalStyles.borderBottomWidth);
+      const availableHeight =
+        viewport.clientHeight -
+        toPixels(viewportStyles.paddingTop) -
+        toPixels(viewportStyles.paddingBottom);
+      const nextHeight = Math.min(
+        content.offsetHeight + modalBorderHeight,
+        availableHeight,
+      );
+
+      if (nextHeight <= 0) {
         return;
       }
 
-      if (measuredHeightRef.current === null && modalRef.current) {
-        modalRef.current.style.height = `${height}px`;
+      if (!isModalMeasured) {
+        modal.style.height = `${nextHeight}px`;
+        setIsModalMeasured(true);
       }
 
-      measuredHeightRef.current = height;
-      setModalHeight(height);
-    },
-    [],
-  );
+      setModalHeight(nextHeight);
+    };
+
+    reportHeight();
+
+    const observer = new ResizeObserver(reportHeight);
+    observer.observe(content);
+    observer.observe(viewport);
+
+    return () => observer.disconnect();
+  }, [isModalMeasured, screen]);
 
   const currentPresentation = screenPresentation[screen];
 
@@ -938,6 +931,7 @@ export default function App() {
             ref={modalRef}
             className={`persistent-modal ${currentPresentation.cardClass}`}
             aria-labelledby={currentPresentation.labelledBy}
+            data-measured={isModalMeasured}
             initial={false}
             animate={modalHeight === null ? undefined : { height: modalHeight }}
             transition={{ height: modalLayoutTransition }}
@@ -946,7 +940,6 @@ export default function App() {
               <MeasuredModalContent
                 key={screen}
                 screen={screen}
-                onHeightReady={handleHeightReady}
                 onTransitionComplete={() => {
                   activeTransitionRef.current = false;
                 }}
