@@ -250,20 +250,23 @@ h1 {
   background: rgba(255, 255, 255, 0.84);
 }
 
-.button-group.is-evasive {
+.button-group.is-floating {
   position: static;
 }
 
-.no-button.is-evasive {
+.no-button.is-floating {
   position: absolute;
   z-index: 5;
   max-width: calc(100% - 32px);
-  cursor: not-allowed;
   box-shadow: 0 10px 24px rgba(117, 64, 78, 0.17);
 }
 
-.no-button.is-evasive:hover {
+.no-button.is-floating:hover {
   transform: none;
+}
+
+.no-button.is-evasive {
+  cursor: not-allowed;
 }
 
 .yes-button:focus-visible,

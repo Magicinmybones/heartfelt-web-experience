@@ -26,8 +26,10 @@ export default function Home() {
   const yesButtonRef = useRef<HTMLButtonElement>(null);
   const noButtonRef = useRef<HTMLButtonElement>(null);
   const [replyIndex, setReplyIndex] = useState(0);
+  const [hasDodged, setHasDodged] = useState(false);
   const [noPosition, setNoPosition] = useState({ x: 0, y: 0 });
   const isEvasive = replyIndex === noReplies.length - 1;
+  const isFloating = hasDodged || isEvasive;
 
   const moveNoButton = useCallback(() => {
     const card = cardRef.current;
@@ -74,7 +76,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (!isEvasive) {
+    if (!isFloating) {
       return;
     }
 
@@ -82,7 +84,19 @@ export default function Home() {
     window.addEventListener("resize", keepButtonInCard);
 
     return () => window.removeEventListener("resize", keepButtonInCard);
-  }, [isEvasive, moveNoButton]);
+  }, [isFloating, moveNoButton]);
+
+  const handleNoApproach = () => {
+    if (isEvasive) {
+      moveNoButton();
+      return;
+    }
+
+    if (!hasDodged) {
+      setHasDodged(true);
+      moveNoButton();
+    }
+  };
 
   const handleNoClick = () => {
     if (isEvasive) {
@@ -92,6 +106,7 @@ export default function Home() {
 
     const nextIndex = Math.min(replyIndex + 1, noReplies.length - 1);
     setReplyIndex(nextIndex);
+    setHasDodged(nextIndex === noReplies.length - 1);
 
     if (nextIndex === noReplies.length - 1) {
       window.requestAnimationFrame(moveNoButton);
@@ -138,7 +153,7 @@ export default function Home() {
         </div>
 
         <div
-          className={`button-group${isEvasive ? " is-evasive" : ""}`}
+          className={`button-group${isFloating ? " is-floating" : ""}`}
           aria-label="Valentine response options"
         >
           <button className="yes-button" type="button" ref={yesButtonRef}>
@@ -148,22 +163,22 @@ export default function Home() {
             </span>
           </button>
           <button
-            className={`no-button${isEvasive ? " is-evasive" : ""}`}
+            className={`no-button${isFloating ? " is-floating" : ""}${
+              isEvasive ? " is-evasive" : ""
+            }`}
             type="button"
             ref={noButtonRef}
             onClick={handleNoClick}
-            onFocus={isEvasive ? moveNoButton : undefined}
-            onPointerEnter={isEvasive ? moveNoButton : undefined}
-            onPointerDown={
-              isEvasive
-                ? (event) => {
-                    event.preventDefault();
-                    moveNoButton();
-                  }
-                : undefined
-            }
+            onFocus={handleNoApproach}
+            onPointerEnter={handleNoApproach}
+            onPointerDown={(event) => {
+              if (isEvasive || !hasDodged) {
+                event.preventDefault();
+                handleNoApproach();
+              }
+            }}
             style={
-              isEvasive
+              isFloating
                 ? { left: `${noPosition.x}px`, top: `${noPosition.y}px` }
                 : undefined
             }
@@ -175,7 +190,7 @@ export default function Home() {
         <p className="sr-only" aria-live="polite">
           {isEvasive
             ? "The No button is running away. The Yes button is still available."
-            : `No button now says: ${noReplies[replyIndex]}`}
+            : `${noReplies[replyIndex]}. This button dodges once, then becomes clickable.`}
         </p>
 
         <p className="card-note" aria-hidden="true">
