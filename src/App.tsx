@@ -28,7 +28,16 @@ const timeOptions = [
 
 const weekDays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
-type Screen = "question" | "celebration" | "schedule";
+const foodOptions = [
+  { name: "Pizza", emoji: "🍕", note: "cheesy & classic" },
+  { name: "Sushi", emoji: "🍣", note: "tiny fancy bites" },
+  { name: "Pasta", emoji: "🍝", note: "main character energy" },
+  { name: "Burger", emoji: "🍔", note: "messy but worth it" },
+  { name: "Tacos", emoji: "🌮", note: "always a good idea" },
+  { name: "Ramen", emoji: "🍜", note: "cozy bowl moment" },
+];
+
+type Screen = "question" | "celebration" | "schedule" | "food";
 
 function QuestionScreen({ onYes }: { onYes: () => void }) {
   const cardRef = useRef<HTMLElement>(null);
@@ -266,7 +275,7 @@ function CelebrationScreen({ onContinue }: { onContinue: () => void }) {
   );
 }
 
-function ScheduleScreen() {
+function ScheduleScreen({ onContinue }: { onContinue: () => void }) {
   const today = useMemo(() => {
     const date = new Date();
     date.setHours(0, 0, 0, 0);
@@ -277,7 +286,6 @@ function ScheduleScreen() {
   );
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState("");
-  const [confirmed, setConfirmed] = useState(false);
 
   const calendarDays = useMemo(() => {
     const year = visibleMonth.getFullYear();
@@ -376,10 +384,7 @@ function ScheduleScreen() {
                   disabled={isOutside || isPast}
                   aria-label={formatDateLabel(date)}
                   aria-pressed={isSelected}
-                  onClick={() => {
-                    setSelectedDate(date);
-                    setConfirmed(false);
-                  }}
+                  onClick={() => setSelectedDate(date)}
                 >
                   {date.getDate()}
                 </button>
@@ -403,10 +408,7 @@ function ScheduleScreen() {
                   name="date-time"
                   value={time}
                   checked={selectedTime === time}
-                  onChange={() => {
-                    setSelectedTime(time);
-                    setConfirmed(false);
-                  }}
+                  onChange={() => setSelectedTime(time)}
                 />
                 <span className="time-label">{time}</span>
                 <span className="time-note">— {note}</span>
@@ -419,20 +421,101 @@ function ScheduleScreen() {
         </fieldset>
 
         <button
-          className={`yes-button schedule-button${
-            confirmed ? " is-confirmed" : ""
-          }`}
+          className="yes-button schedule-button"
           type="button"
           disabled={!selectionComplete}
-          onClick={() => setConfirmed(true)}
+          onClick={onContinue}
         >
-          {confirmed ? "It’s a date! 💕" : "Okay, next →"}
+          Okay, next →
         </button>
 
-        <p className="schedule-status" aria-live="polite">
-          {confirmed && selectedDate
-            ? `${formatDateLabel(selectedDate)} at ${selectedTime}. Perfect!`
+        <p className="schedule-status">
+          {selectedDate && selectedTime
+            ? `${formatDateLabel(selectedDate)} at ${selectedTime}`
             : "\u00A0"}
+        </p>
+      </section>
+    </main>
+  );
+}
+
+function FoodScreen() {
+  const [selectedFoods, setSelectedFoods] = useState<string[]>([]);
+  const [submitted, setSubmitted] = useState(false);
+
+  const toggleFood = (food: string) => {
+    setSelectedFoods((current) =>
+      current.includes(food)
+        ? current.filter((item) => item !== food)
+        : [...current, food],
+    );
+    setSubmitted(false);
+  };
+
+  return (
+    <main className="valentine-page food-page">
+      <div className="food-glow" aria-hidden="true" />
+
+      <section className="food-card" aria-labelledby="food-title">
+        <div className="portrait-shell food-portrait-shell">
+          <img
+            src="/food-picker-cat.png"
+            alt="A hungry tabby cat waiting eagerly behind an empty plate"
+            width="132"
+            height="132"
+            className="kitten-portrait"
+          />
+          <span className="portrait-heart food-badge" aria-hidden="true">
+            🍴
+          </span>
+        </div>
+
+        <header className="food-header">
+          <p className="eyebrow">The delicious part</p>
+          <h1 id="food-title">What are we feeling?</h1>
+          <p>You can pick more than one, btw.</p>
+        </header>
+
+        <div className="food-grid" aria-label="Choose one or more foods">
+          {foodOptions.map(({ name, emoji, note }) => {
+            const isSelected = selectedFoods.includes(name);
+
+            return (
+              <button
+                type="button"
+                className={`food-option${isSelected ? " is-selected" : ""}`}
+                key={name}
+                aria-pressed={isSelected}
+                onClick={() => toggleFood(name)}
+              >
+                <span className="food-emoji" aria-hidden="true">
+                  {emoji}
+                </span>
+                <span className="food-name">{name}</span>
+                <span className="food-note">{note}</span>
+                <span className="food-selected-mark" aria-hidden="true">
+                  ✓
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <button
+          className={`yes-button food-submit${submitted ? " is-confirmed" : ""}`}
+          type="button"
+          disabled={selectedFoods.length === 0}
+          onClick={() => setSubmitted(true)}
+        >
+          {submitted ? "Excellent choices! 💖" : "This one!! 🎉"}
+        </button>
+
+        <p className="food-status" aria-live="polite">
+          {submitted
+            ? `Perfect — ${selectedFoods.join(", ")} it is!`
+            : selectedFoods.length > 0
+              ? `${selectedFoods.length} selected`
+              : "\u00A0"}
         </p>
       </section>
     </main>
@@ -465,7 +548,10 @@ export default function App() {
       {screen === "celebration" && (
         <CelebrationScreen onContinue={() => setScreen("schedule")} />
       )}
-      {screen === "schedule" && <ScheduleScreen />}
+      {screen === "schedule" && (
+        <ScheduleScreen onContinue={() => setScreen("food")} />
+      )}
+      {screen === "food" && <FoodScreen />}
     </div>
   );
 }

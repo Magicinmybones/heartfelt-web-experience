@@ -96,9 +96,18 @@ button {
     url("/schedule-watercolor-bg.png") center / cover fixed no-repeat;
 }
 
+.food-page {
+  min-height: 0;
+  overflow: hidden;
+  background:
+    linear-gradient(rgba(255, 249, 243, 0.12), rgba(247, 191, 198, 0.12)),
+    url("/food-watercolor-bg.png") center / cover fixed no-repeat;
+}
+
 .background-glow,
 .celebration-glow,
-.schedule-glow {
+.schedule-glow,
+.food-glow {
   position: absolute;
   z-index: -1;
   width: min(720px, 90vw);
@@ -117,6 +126,12 @@ button {
   position: fixed;
   background: rgba(255, 255, 255, 0.42);
   filter: blur(72px);
+}
+
+.food-glow {
+  position: fixed;
+  background: rgba(255, 250, 235, 0.46);
+  filter: blur(76px);
 }
 
 .proposal-card {
@@ -173,7 +188,8 @@ button {
     inset 0 1px 0 rgba(255, 255, 255, 0.94);
 }
 
-.schedule-card {
+.schedule-card,
+.food-card {
   position: relative;
   display: flex;
   width: min(590px, calc(100vw - 32px));
@@ -200,20 +216,34 @@ button {
   -webkit-overflow-scrolling: touch;
 }
 
+.food-card {
+  width: min(610px, calc(100vw - 32px));
+  padding: clamp(32px, 5vw, 48px) clamp(24px, 6vw, 54px) 26px;
+  border-color: rgba(255, 255, 255, 0.84);
+  background: rgba(255, 253, 251, 0.91);
+  box-shadow:
+    0 32px 90px rgba(130, 52, 75, 0.18),
+    0 8px 24px rgba(126, 61, 79, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96);
+}
+
 .schedule-card::-webkit-scrollbar,
-.proposal-card::-webkit-scrollbar {
+.proposal-card::-webkit-scrollbar,
+.food-card::-webkit-scrollbar {
   width: 10px;
 }
 
 .schedule-card::-webkit-scrollbar-track,
-.proposal-card::-webkit-scrollbar-track {
+.proposal-card::-webkit-scrollbar-track,
+.food-card::-webkit-scrollbar-track {
   margin-block: 22px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.14);
 }
 
 .schedule-card::-webkit-scrollbar-thumb,
-.proposal-card::-webkit-scrollbar-thumb {
+.proposal-card::-webkit-scrollbar-thumb,
+.food-card::-webkit-scrollbar-thumb {
   min-height: 52px;
   border: 3px solid transparent;
   border-radius: 999px;
@@ -222,17 +252,20 @@ button {
 }
 
 .schedule-card::-webkit-scrollbar-thumb:hover,
-.proposal-card::-webkit-scrollbar-thumb:hover {
+.proposal-card::-webkit-scrollbar-thumb:hover,
+.food-card::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, #ed5f8b, #c8215c);
   background-clip: padding-box;
 }
 
 .schedule-card::-webkit-scrollbar-corner,
-.proposal-card::-webkit-scrollbar-corner {
+.proposal-card::-webkit-scrollbar-corner,
+.food-card::-webkit-scrollbar-corner {
   background: transparent;
 }
 
-.schedule-card::before {
+.schedule-card::before,
+.food-card::before {
   position: absolute;
   top: -52px;
   right: -30px;
@@ -242,6 +275,12 @@ button {
   content: "♥";
   rotate: 12deg;
   pointer-events: none;
+}
+
+.food-card::before {
+  color: rgba(234, 95, 130, 0.065);
+  font-size: 160px;
+  rotate: -10deg;
 }
 
 .schedule-header {
@@ -501,6 +540,171 @@ button {
   font-style: italic;
 }
 
+.food-portrait-shell {
+  width: clamp(102px, 23vw, 122px);
+  margin-bottom: 22px;
+  background: linear-gradient(145deg, #ffe3c4, #d99062);
+  box-shadow:
+    0 15px 34px rgba(157, 82, 47, 0.2),
+    0 2px 8px rgba(90, 55, 49, 0.1);
+}
+
+.food-badge {
+  width: 38px;
+  height: 38px;
+  background: linear-gradient(145deg, #ff9c66, #e63772);
+  box-shadow: 0 7px 17px rgba(209, 52, 101, 0.25);
+  font-size: 15px;
+}
+
+.food-header {
+  position: relative;
+  z-index: 1;
+}
+
+.food-header h1 {
+  max-width: 440px;
+  font-size: clamp(2rem, 7vw, 2.7rem);
+  line-height: 1.02;
+}
+
+.food-header > p:last-child {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: clamp(0.86rem, 3vw, 0.98rem);
+}
+
+.food-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.food-option {
+  position: relative;
+  display: flex;
+  min-height: 138px;
+  cursor: pointer;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 10px 12px;
+  overflow: hidden;
+  border: 1px solid rgba(145, 103, 122, 0.18);
+  border-radius: 21px;
+  color: #5b4451;
+  background: rgba(255, 255, 255, 0.52);
+  box-shadow:
+    0 9px 22px rgba(99, 62, 79, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.food-option:hover {
+  transform: translateY(-3px);
+  border-color: rgba(229, 51, 111, 0.34);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow:
+    0 14px 28px rgba(164, 52, 92, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.food-option.is-selected {
+  transform: translateY(-2px);
+  border-color: rgba(225, 42, 105, 0.5);
+  background:
+    linear-gradient(rgba(255, 244, 248, 0.91), rgba(255, 235, 241, 0.87));
+  box-shadow:
+    0 14px 28px rgba(187, 45, 96, 0.13),
+    inset 0 0 0 1px rgba(245, 111, 153, 0.2);
+}
+
+.food-emoji {
+  display: block;
+  font-size: clamp(2rem, 6vw, 2.45rem);
+  line-height: 1;
+  filter: drop-shadow(0 5px 7px rgba(113, 66, 47, 0.12));
+  transition: transform 180ms ease;
+}
+
+.food-option:hover .food-emoji,
+.food-option.is-selected .food-emoji {
+  transform: scale(1.08) rotate(-2deg);
+}
+
+.food-name {
+  margin-top: 11px;
+  font-size: 0.91rem;
+  font-weight: 750;
+}
+
+.food-note {
+  margin-top: 3px;
+  color: #9a7f8c;
+  font-size: 0.67rem;
+  line-height: 1.25;
+}
+
+.food-selected-mark {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border-radius: 50%;
+  color: white;
+  opacity: 0;
+  background: linear-gradient(145deg, #f65b8c, #df226b);
+  box-shadow: 0 5px 10px rgba(201, 42, 97, 0.2);
+  font-size: 0.72rem;
+  font-weight: 900;
+  transform: scale(0.55);
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.food-option.is-selected .food-selected-mark {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.food-submit {
+  position: relative;
+  z-index: 1;
+  margin-top: 25px;
+}
+
+.food-submit:disabled {
+  cursor: not-allowed;
+  color: rgba(255, 255, 255, 0.8);
+  background: linear-gradient(135deg, #c7c4d4, #aaa9bf);
+  box-shadow: none;
+}
+
+.food-submit.is-confirmed {
+  background: linear-gradient(135deg, #f06687, #dc2c6e);
+}
+
+.food-status {
+  min-height: 18px;
+  margin: 10px 0 0;
+  color: #a94a6a;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
 .portrait-shell {
   position: relative;
   width: clamp(104px, 26vw, 132px);
@@ -681,6 +885,7 @@ h1 {
 .no-button:focus-visible,
 .month-arrow:focus-visible,
 .date-button:focus-visible,
+.food-option:focus-visible,
 .time-option:has(input:focus-visible) {
   outline: 3px solid rgba(128, 48, 80, 0.36);
   outline-offset: 4px;
@@ -908,10 +1113,37 @@ h1 {
     background-attachment: scroll;
   }
 
+  .food-page {
+    padding: 16px 12px;
+    background-attachment: scroll;
+  }
+
   .schedule-card {
     width: min(100%, 430px);
     padding: 30px 17px 22px;
     border-radius: 28px;
+  }
+
+  .food-card {
+    width: min(100%, 440px);
+    padding: 27px 17px 21px;
+    border-radius: 28px;
+  }
+
+  .food-portrait-shell {
+    width: 94px;
+    margin-bottom: 18px;
+  }
+
+  .food-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 22px;
+  }
+
+  .food-option {
+    min-height: 125px;
+    border-radius: 18px;
   }
 
   .calendar {
