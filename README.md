@@ -10,8 +10,9 @@ npm install
 npm run dev
 ```
 
-The development server runs at `http://localhost:5173` and uses a strict port,
-so it will report an error instead of silently switching to another port.
+The development server tries `http://localhost:5173` first. If that port is
+occupied, Vite automatically chooses the next available local port and prints
+the exact URL in the terminal.
 
 ## Build
 
