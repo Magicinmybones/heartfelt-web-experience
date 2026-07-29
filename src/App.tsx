@@ -1,6 +1,7 @@
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -771,6 +772,10 @@ export default function App() {
   const [foodChoices, setFoodChoices] = useState<string[]>([]);
   const modalRef = useRef<HTMLElement>(null);
   const activeTransitionRef = useRef(false);
+
+  useLayoutEffect(() => {
+    modalRef.current?.scrollTo({ top: 0, left: 0 });
+  }, [screen]);
 
   useEffect(() => {
     const nextScreen = screenSequence[screenSequence.indexOf(screen) + 1];
