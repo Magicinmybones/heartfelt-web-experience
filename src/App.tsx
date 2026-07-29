@@ -48,6 +48,7 @@ function QuestionScreen({ onYes }: { onYes: () => void }) {
   const cardRef = useRef<HTMLElement>(null);
   const yesButtonRef = useRef<HTMLButtonElement>(null);
   const noButtonRef = useRef<HTMLButtonElement>(null);
+  const ignoreNextNoClickRef = useRef(false);
   const [replyIndex, setReplyIndex] = useState(0);
   const [hasDodged, setHasDodged] = useState(false);
   const [noPosition, setNoPosition] = useState({ x: 0, y: 0 });
@@ -121,6 +122,10 @@ function QuestionScreen({ onYes }: { onYes: () => void }) {
   };
 
   const handleNoClick = () => {
+    if (ignoreNextNoClickRef.current) {
+      return;
+    }
+
     if (isEvasive) {
       moveNoButton();
       return;
@@ -133,6 +138,18 @@ function QuestionScreen({ onYes }: { onYes: () => void }) {
     if (nextIndex === noReplies.length - 1) {
       window.requestAnimationFrame(moveNoButton);
     }
+  };
+
+  const finishNoPointerGesture = (
+    event: React.PointerEvent<HTMLButtonElement>,
+  ) => {
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+
+    window.requestAnimationFrame(() => {
+      ignoreNextNoClickRef.current = false;
+    });
   };
 
   return (
@@ -180,29 +197,45 @@ function QuestionScreen({ onYes }: { onYes: () => void }) {
               ✨
             </span>
           </button>
-          <button
-            className={`no-button${isFloating ? " is-floating" : ""}${
-              isEvasive ? " is-evasive" : ""
-            }`}
-            type="button"
-            ref={noButtonRef}
-            onClick={handleNoClick}
-            onFocus={handleNoApproach}
-            onPointerEnter={handleNoApproach}
-            onPointerDown={(event) => {
-              if (isEvasive || !hasDodged) {
+          <span className="no-button-slot">
+            <span
+              className="no-button no-button-placeholder"
+              aria-hidden="true"
+            >
+              {noReplies[replyIndex]}
+            </span>
+            <button
+              className={`no-button${isFloating ? " is-floating" : ""}${
+                isEvasive ? " is-evasive" : ""
+              }`}
+              type="button"
+              ref={noButtonRef}
+              onClick={handleNoClick}
+              onFocus={handleNoApproach}
+              onPointerEnter={handleNoApproach}
+              onPointerDown={(event) => {
+                const shouldDodge = isEvasive || !hasDodged;
+
+                if (!shouldDodge) {
+                  return;
+                }
+
+                ignoreNextNoClickRef.current = true;
                 event.preventDefault();
+                event.currentTarget.setPointerCapture(event.pointerId);
                 handleNoApproach();
+              }}
+              onPointerUp={finishNoPointerGesture}
+              onPointerCancel={finishNoPointerGesture}
+              style={
+                isFloating
+                  ? { left: `${noPosition.x}px`, top: `${noPosition.y}px` }
+                  : undefined
               }
-            }}
-            style={
-              isFloating
-                ? { left: `${noPosition.x}px`, top: `${noPosition.y}px` }
-                : undefined
-            }
-          >
-            {noReplies[replyIndex]}
-          </button>
+            >
+              {noReplies[replyIndex]}
+            </button>
+          </span>
         </div>
 
         <p className="sr-only" aria-live="polite">

@@ -1111,9 +1111,12 @@ h1 {
 }
 
 .no-button {
+  display: inline-flex;
   max-width: min(230px, 100%);
   min-width: 92px;
   min-height: 46px;
+  align-items: center;
+  justify-content: center;
   padding: 0 25px;
   border: 1.5px solid #e1a4b6;
   border-radius: 999px;
@@ -1123,6 +1126,23 @@ h1 {
   font-size: 0.9rem;
   font-weight: 600;
   white-space: nowrap;
+}
+
+.no-button-slot {
+  display: grid;
+  max-width: 100%;
+  place-items: center;
+}
+
+.no-button-slot > .no-button:not(.is-floating),
+.no-button-placeholder {
+  grid-area: 1 / 1;
+}
+
+.no-button-placeholder {
+  visibility: hidden;
+  pointer-events: none;
+  user-select: none;
 }
 
 .yes-button:hover {
