@@ -1,7 +1,15 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+  type RefObject,
+} from "react";
 import {
   AnimatePresence,
-  LayoutGroup,
   MotionConfig,
   motion,
   type Transition,
@@ -63,6 +71,42 @@ const screenFadeTransition = {
   ease: [0.22, 1, 0.36, 1],
 } satisfies Transition;
 
+const contentTransition = {
+  duration: 0.32,
+  ease: [0.22, 1, 0.36, 1],
+} satisfies Transition;
+
+const screenPresentation: Record<
+  Screen,
+  { pageClass: string; cardClass: string; labelledBy: string }
+> = {
+  question: {
+    pageClass: "question-page",
+    cardClass: "proposal-card",
+    labelledBy: "proposal-title",
+  },
+  celebration: {
+    pageClass: "celebration-page",
+    cardClass: "proposal-card celebration-card",
+    labelledBy: "celebration-title",
+  },
+  schedule: {
+    pageClass: "schedule-page",
+    cardClass: "schedule-card",
+    labelledBy: "schedule-title",
+  },
+  food: {
+    pageClass: "food-page",
+    cardClass: "food-card",
+    labelledBy: "food-title",
+  },
+  final: {
+    pageClass: "final-page",
+    cardClass: "final-card",
+    labelledBy: "final-title",
+  },
+};
+
 const screenSequence: Screen[] = [
   "question",
   "celebration",
@@ -73,10 +117,7 @@ const screenSequence: Screen[] = [
 
 const screenAssets: Record<Screen, string[]> = {
   question: ["/valentine-watercolor-bg.png", "/shy-kitten.png"],
-  celebration: [
-    "/celebration-watercolor-bg.png",
-    "/celebration-cat.png",
-  ],
+  celebration: ["/celebration-watercolor-bg.png", "/celebration-cat.png"],
   schedule: ["/schedule-watercolor-bg.png"],
   food: ["/food-watercolor-bg.png", "/food-picker-cat.png"],
   final: [
@@ -86,8 +127,13 @@ const screenAssets: Record<Screen, string[]> = {
   ],
 };
 
-function QuestionScreen({ onYes }: { onYes: () => void }) {
-  const cardRef = useRef<HTMLElement>(null);
+function QuestionContent({
+  onYes,
+  cardRef,
+}: {
+  onYes: () => void;
+  cardRef: RefObject<HTMLElement | null>;
+}) {
   const yesButtonRef = useRef<HTMLButtonElement>(null);
   const noButtonRef = useRef<HTMLButtonElement>(null);
   const ignoreNextNoClickRef = useRef(false);
@@ -195,173 +241,137 @@ function QuestionScreen({ onYes }: { onYes: () => void }) {
   };
 
   return (
-    <main className="valentine-page question-page">
-      <BackgroundDecorations />
-
-      <motion.section
-        layout
-        layoutId="valentine-modal"
-        transition={{ layout: modalLayoutTransition }}
-        className="proposal-card"
-        aria-labelledby="proposal-title"
-        ref={cardRef}
-      >
-        <div className="portrait-shell">
-          <img
-            src="/shy-kitten.png"
-            alt="A tiny gray kitten raising its paw"
-            width="132"
-            height="132"
-            className="kitten-portrait"
-          />
-          <span className="portrait-heart" aria-hidden="true">
-            ♥
-          </span>
-        </div>
-
-        <div className="copy-block">
-          <p className="eyebrow">A little question for you</p>
-          <h1 id="proposal-title">Will you be my valentine?</h1>
-          <p className="supporting-copy">
-            this is a yes or yes situation, btw
-          </p>
-        </div>
-
-        <div
-          className={`button-group${isFloating ? " is-floating" : ""}`}
-          aria-label="Valentine response options"
-        >
-          <button
-            className="yes-button"
-            type="button"
-            ref={yesButtonRef}
-            onClick={onYes}
-          >
-            <span>Yes!</span>
-            <span className="button-sparkles" aria-hidden="true">
-              ✨
-            </span>
-          </button>
-          <span className="no-button-slot">
-            <span
-              className="no-button no-button-placeholder"
-              aria-hidden="true"
-            >
-              {noReplies[replyIndex]}
-            </span>
-            <button
-              className={`no-button${isFloating ? " is-floating" : ""}${
-                isEvasive ? " is-evasive" : ""
-              }`}
-              type="button"
-              ref={noButtonRef}
-              onClick={handleNoClick}
-              onFocus={handleNoApproach}
-              onPointerEnter={handleNoApproach}
-              onPointerDown={(event) => {
-                const shouldDodge = isEvasive || !hasDodged;
-
-                if (!shouldDodge) {
-                  return;
-                }
-
-                ignoreNextNoClickRef.current = true;
-                event.preventDefault();
-                event.currentTarget.setPointerCapture(event.pointerId);
-                handleNoApproach();
-              }}
-              onPointerUp={finishNoPointerGesture}
-              onPointerCancel={finishNoPointerGesture}
-              style={
-                isFloating
-                  ? { left: `${noPosition.x}px`, top: `${noPosition.y}px` }
-                  : undefined
-              }
-            >
-              {noReplies[replyIndex]}
-            </button>
-          </span>
-        </div>
-
-        <p className="sr-only" aria-live="polite">
-          {isEvasive
-            ? "The No button is running away. The Yes button is still available."
-            : `${noReplies[replyIndex]}. This button dodges once, then becomes clickable.`}
-        </p>
-
-        <p className="card-note" aria-hidden="true">
-          made with a whole lot of love
-        </p>
-      </motion.section>
-    </main>
-  );
-}
-
-function CelebrationScreen({ onContinue }: { onContinue: () => void }) {
-  return (
-    <main className="valentine-page celebration-page">
-      <div className="celebration-glow" aria-hidden="true" />
-      <div className="confetti-layer" aria-hidden="true">
-        <span className="confetti confetti-one">◆</span>
-        <span className="confetti confetti-two">●</span>
-        <span className="confetti confetti-three">★</span>
-        <span className="confetti confetti-four">◆</span>
-        <span className="confetti confetti-five">●</span>
-        <span className="confetti confetti-six">★</span>
+    <>
+      <div className="portrait-shell">
+        <img
+          src="/shy-kitten.png"
+          alt="A tiny gray kitten raising its paw"
+          width="132"
+          height="132"
+          className="kitten-portrait"
+        />
+        <span className="portrait-heart" aria-hidden="true">
+          ♥
+        </span>
       </div>
 
-      <motion.section
-        layout
-        layoutId="valentine-modal"
-        transition={{ layout: modalLayoutTransition }}
-        className="proposal-card celebration-card"
-        aria-labelledby="celebration-title"
+      <div className="copy-block">
+        <p className="eyebrow">A little question for you</p>
+        <h1 id="proposal-title">Will you be my valentine?</h1>
+        <p className="supporting-copy">this is a yes or yes situation, btw</p>
+      </div>
+
+      <div
+        className={`button-group${isFloating ? " is-floating" : ""}`}
+        aria-label="Valentine response options"
       >
-        <div className="portrait-shell celebration-portrait-shell">
-          <img
-            src="/celebration-cat.png"
-            alt="A delighted orange cat standing with both paws raised"
-            width="132"
-            height="132"
-            className="kitten-portrait"
-          />
-          <span className="portrait-heart celebration-badge" aria-hidden="true">
-            ✦
-          </span>
-        </div>
-
-        <div className="copy-block">
-          <p className="eyebrow">Plot twist!</p>
-          <h1 id="celebration-title">Wait… you actually said yes??</h1>
-          <p className="supporting-copy">
-            I was so ready for you to say no
-          </p>
-        </div>
-
-        <div className="celebration-emojis" aria-label="Celebration">
-          <span>🎉</span>
-          <span>💃</span>
-          <span>🥹</span>
-          <span>💖</span>
-        </div>
-
         <button
-          className="yes-button celebration-button"
+          className="yes-button"
           type="button"
-          onClick={onContinue}
+          ref={yesButtonRef}
+          onClick={onYes}
         >
-          Okay okay! <span aria-hidden="true">😊</span>
+          <span>Yes!</span>
+          <span className="button-sparkles" aria-hidden="true">
+            ✨
+          </span>
         </button>
+        <span className="no-button-slot">
+          <span className="no-button no-button-placeholder" aria-hidden="true">
+            {noReplies[replyIndex]}
+          </span>
+          <button
+            className={`no-button${isFloating ? " is-floating" : ""}${
+              isEvasive ? " is-evasive" : ""
+            }`}
+            type="button"
+            ref={noButtonRef}
+            onClick={handleNoClick}
+            onFocus={handleNoApproach}
+            onPointerEnter={handleNoApproach}
+            onPointerDown={(event) => {
+              const shouldDodge = isEvasive || !hasDodged;
 
-        <p className="card-note" aria-hidden="true">
-          best answer ever
-        </p>
-      </motion.section>
-    </main>
+              if (!shouldDodge) {
+                return;
+              }
+
+              ignoreNextNoClickRef.current = true;
+              event.preventDefault();
+              event.currentTarget.setPointerCapture(event.pointerId);
+              handleNoApproach();
+            }}
+            onPointerUp={finishNoPointerGesture}
+            onPointerCancel={finishNoPointerGesture}
+            style={
+              isFloating
+                ? { left: `${noPosition.x}px`, top: `${noPosition.y}px` }
+                : undefined
+            }
+          >
+            {noReplies[replyIndex]}
+          </button>
+        </span>
+      </div>
+
+      <p className="sr-only" aria-live="polite">
+        {isEvasive
+          ? "The No button is running away. The Yes button is still available."
+          : `${noReplies[replyIndex]}. This button dodges once, then becomes clickable.`}
+      </p>
+
+      <p className="card-note" aria-hidden="true">
+        made with a whole lot of love
+      </p>
+    </>
   );
 }
 
-function ScheduleScreen({
+function CelebrationContent({ onContinue }: { onContinue: () => void }) {
+  return (
+    <>
+      <div className="portrait-shell celebration-portrait-shell">
+        <img
+          src="/celebration-cat.png"
+          alt="A delighted orange cat standing with both paws raised"
+          width="132"
+          height="132"
+          className="kitten-portrait"
+        />
+        <span className="portrait-heart celebration-badge" aria-hidden="true">
+          ✦
+        </span>
+      </div>
+
+      <div className="copy-block">
+        <p className="eyebrow">Plot twist!</p>
+        <h1 id="celebration-title">Wait… you actually said yes??</h1>
+        <p className="supporting-copy">I was so ready for you to say no</p>
+      </div>
+
+      <div className="celebration-emojis" aria-label="Celebration">
+        <span>🎉</span>
+        <span>💃</span>
+        <span>🥹</span>
+        <span>💖</span>
+      </div>
+
+      <button
+        className="yes-button celebration-button"
+        type="button"
+        onClick={onContinue}
+      >
+        Okay okay! <span aria-hidden="true">😊</span>
+      </button>
+
+      <p className="card-note" aria-hidden="true">
+        best answer ever
+      </p>
+    </>
+  );
+}
+
+function ScheduleContent({
   onContinue,
 }: {
   onContinue: (choice: ScheduleChoice) => void;
@@ -406,140 +416,128 @@ function ScheduleScreen({
     }).format(date);
 
   return (
-    <main className="valentine-page schedule-page">
-      <div className="schedule-glow" aria-hidden="true" />
+    <>
+      <header className="schedule-header">
+        <p className="eyebrow">One tiny detail</p>
+        <h1 id="schedule-title">So… when are you free?</h1>
+        <p>Pick a day, any day — I cleared my schedule.</p>
+      </header>
 
-      <motion.section
-        layout
-        layoutId="valentine-modal"
-        transition={{ layout: modalLayoutTransition }}
-        className="schedule-card"
-        aria-labelledby="schedule-title"
-      >
-        <header className="schedule-header">
-          <p className="eyebrow">One tiny detail</p>
-          <h1 id="schedule-title">So… when are you free?</h1>
-          <p>Pick a day, any day — I cleared my schedule.</p>
-        </header>
-
-        <div className="calendar" aria-label="Choose a date">
-          <div className="calendar-toolbar">
-            <button
-              type="button"
-              className="month-arrow"
-              aria-label="Previous month"
-              disabled={isCurrentMonth}
-              onClick={() => moveMonth(-1)}
-            >
-              ‹
-            </button>
-            <p aria-live="polite">
-              {visibleMonth.toLocaleDateString(undefined, {
-                month: "long",
-                year: "numeric",
-              })}
-            </p>
-            <button
-              type="button"
-              className="month-arrow"
-              aria-label="Next month"
-              onClick={() => moveMonth(1)}
-            >
-              ›
-            </button>
-          </div>
-
-          <div className="calendar-grid calendar-weekdays" aria-hidden="true">
-            {weekDays.map((day) => (
-              <span key={day}>{day}</span>
-            ))}
-          </div>
-
-          <div className="calendar-grid calendar-dates">
-            {calendarDays.map((date) => {
-              const isOutside =
-                date.getMonth() !== visibleMonth.getMonth();
-              const isPast = date < today;
-              const isSelected =
-                selectedDate?.getTime() === date.getTime();
-              const isToday = date.getTime() === today.getTime();
-              const dateKey = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
-
-              return (
-                <button
-                  type="button"
-                  key={dateKey}
-                  className={[
-                    "date-button",
-                    isOutside ? "is-outside" : "",
-                    isSelected ? "is-selected" : "",
-                    isToday ? "is-today" : "",
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
-                  disabled={isOutside || isPast}
-                  aria-label={formatDateLabel(date)}
-                  aria-pressed={isSelected}
-                  onClick={() => setSelectedDate(date)}
-                >
-                  {date.getDate()}
-                </button>
-              );
+      <div className="calendar" aria-label="Choose a date">
+        <div className="calendar-toolbar">
+          <button
+            type="button"
+            className="month-arrow"
+            aria-label="Previous month"
+            disabled={isCurrentMonth}
+            onClick={() => moveMonth(-1)}
+          >
+            ‹
+          </button>
+          <p aria-live="polite">
+            {visibleMonth.toLocaleDateString(undefined, {
+              month: "long",
+              year: "numeric",
             })}
-          </div>
+          </p>
+          <button
+            type="button"
+            className="month-arrow"
+            aria-label="Next month"
+            onClick={() => moveMonth(1)}
+          >
+            ›
+          </button>
         </div>
 
-        <fieldset className="time-picker">
-          <legend>What time?</legend>
-          <div className="time-options">
-            {timeOptions.map(({ time, note }) => (
-              <label
-                className={`time-option${
-                  selectedTime === time ? " is-selected" : ""
-                }`}
-                key={time}
+        <div className="calendar-grid calendar-weekdays" aria-hidden="true">
+          {weekDays.map((day) => (
+            <span key={day}>{day}</span>
+          ))}
+        </div>
+
+        <div className="calendar-grid calendar-dates">
+          {calendarDays.map((date) => {
+            const isOutside = date.getMonth() !== visibleMonth.getMonth();
+            const isPast = date < today;
+            const isSelected = selectedDate?.getTime() === date.getTime();
+            const isToday = date.getTime() === today.getTime();
+            const dateKey = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+
+            return (
+              <button
+                type="button"
+                key={dateKey}
+                className={[
+                  "date-button",
+                  isOutside ? "is-outside" : "",
+                  isSelected ? "is-selected" : "",
+                  isToday ? "is-today" : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                disabled={isOutside || isPast}
+                aria-label={formatDateLabel(date)}
+                aria-pressed={isSelected}
+                onClick={() => setSelectedDate(date)}
               >
-                <input
-                  type="radio"
-                  name="date-time"
-                  value={time}
-                  checked={selectedTime === time}
-                  onChange={() => setSelectedTime(time)}
-                />
-                <span className="time-label">{time}</span>
-                <span className="time-note">— {note}</span>
-                <span className="time-check" aria-hidden="true">
-                  ♥
-                </span>
-              </label>
-            ))}
-          </div>
-        </fieldset>
+                {date.getDate()}
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
-        <button
-          className="yes-button schedule-button"
-          type="button"
-          disabled={!selectionComplete}
-          onClick={() => {
-            if (selectedDate) {
-              onContinue({ date: selectedDate, time: selectedTime });
-            }
-          }}
-        >
-          Okay, next →
-        </button>
+      <fieldset className="time-picker">
+        <legend>What time?</legend>
+        <div className="time-options">
+          {timeOptions.map(({ time, note }) => (
+            <label
+              className={`time-option${
+                selectedTime === time ? " is-selected" : ""
+              }`}
+              key={time}
+            >
+              <input
+                type="radio"
+                name="date-time"
+                value={time}
+                checked={selectedTime === time}
+                onChange={() => setSelectedTime(time)}
+              />
+              <span className="time-label">{time}</span>
+              <span className="time-note">— {note}</span>
+              <span className="time-check" aria-hidden="true">
+                ♥
+              </span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
 
-        <p className="schedule-status">
-          {selectedDate && selectedTime
-            ? `${formatDateLabel(selectedDate)} at ${selectedTime}`
-            : "\u00A0"}
-        </p>
-      </motion.section>
-    </main>
+      <button
+        className="yes-button schedule-button"
+        type="button"
+        disabled={!selectionComplete}
+        onClick={() => {
+          if (selectedDate) {
+            onContinue({ date: selectedDate, time: selectedTime });
+          }
+        }}
+      >
+        Okay, next →
+      </button>
+
+      <p className="schedule-status">
+        {selectedDate && selectedTime
+          ? `${formatDateLabel(selectedDate)} at ${selectedTime}`
+          : "\u00A0"}
+      </p>
+    </>
   );
 }
 
-function FoodScreen({
+function FoodContent({
   onContinue,
 }: {
   onContinue: (foods: string[]) => void;
@@ -555,80 +553,70 @@ function FoodScreen({
   };
 
   return (
-    <main className="valentine-page food-page">
-      <div className="food-glow" aria-hidden="true" />
+    <>
+      <div className="portrait-shell food-portrait-shell">
+        <img
+          src="/food-picker-cat.png"
+          alt="A hungry tabby cat waiting eagerly behind an empty plate"
+          width="132"
+          height="132"
+          className="kitten-portrait"
+        />
+        <span className="portrait-heart food-badge" aria-hidden="true">
+          🍴
+        </span>
+      </div>
 
-      <motion.section
-        layout
-        layoutId="valentine-modal"
-        transition={{ layout: modalLayoutTransition }}
-        className="food-card"
-        aria-labelledby="food-title"
+      <header className="food-header">
+        <p className="eyebrow">The delicious part</p>
+        <h1 id="food-title">What are we feeling?</h1>
+        <p>You can pick more than one, btw.</p>
+      </header>
+
+      <div className="food-grid" aria-label="Choose one or more foods">
+        {foodOptions.map(({ name, emoji, note }) => {
+          const isSelected = selectedFoods.includes(name);
+
+          return (
+            <button
+              type="button"
+              className={`food-option${isSelected ? " is-selected" : ""}`}
+              key={name}
+              aria-pressed={isSelected}
+              onClick={() => toggleFood(name)}
+            >
+              <span className="food-emoji" aria-hidden="true">
+                {emoji}
+              </span>
+              <span className="food-name">{name}</span>
+              <span className="food-note">{note}</span>
+              <span className="food-selected-mark" aria-hidden="true">
+                ✓
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      <button
+        className="yes-button food-submit"
+        type="button"
+        disabled={selectedFoods.length === 0}
+        onClick={() => onContinue(selectedFoods)}
       >
-        <div className="portrait-shell food-portrait-shell">
-          <img
-            src="/food-picker-cat.png"
-            alt="A hungry tabby cat waiting eagerly behind an empty plate"
-            width="132"
-            height="132"
-            className="kitten-portrait"
-          />
-          <span className="portrait-heart food-badge" aria-hidden="true">
-            🍴
-          </span>
-        </div>
+        This one!! 🎉
+      </button>
 
-        <header className="food-header">
-          <p className="eyebrow">The delicious part</p>
-          <h1 id="food-title">What are we feeling?</h1>
-          <p>You can pick more than one, btw.</p>
-        </header>
-
-        <div className="food-grid" aria-label="Choose one or more foods">
-          {foodOptions.map(({ name, emoji, note }) => {
-            const isSelected = selectedFoods.includes(name);
-
-            return (
-              <button
-                type="button"
-                className={`food-option${isSelected ? " is-selected" : ""}`}
-                key={name}
-                aria-pressed={isSelected}
-                onClick={() => toggleFood(name)}
-              >
-                <span className="food-emoji" aria-hidden="true">
-                  {emoji}
-                </span>
-                <span className="food-name">{name}</span>
-                <span className="food-note">{note}</span>
-                <span className="food-selected-mark" aria-hidden="true">
-                  ✓
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        <button
-          className="yes-button food-submit"
-          type="button"
-          disabled={selectedFoods.length === 0}
-          onClick={() => onContinue(selectedFoods)}
-        >
-          This one!! 🎉
-        </button>
-
-        <p className="food-status">
-          {selectedFoods.length > 0
-            ? `${selectedFoods.length} selected`
-            : "\u00A0"}
-        </p>
-      </motion.section>
-    </main>
+      <p className="food-status">
+        {selectedFoods.length > 0
+          ? `${selectedFoods.length} selected`
+          : "\u00A0"}
+      </p>
+    </>
   );
 }
 
-function FinalScreen({
+function FinalContent({
   schedule,
   foods,
 }: {
@@ -646,94 +634,78 @@ function FinalScreen({
   });
 
   return (
-    <main className="valentine-page final-page">
-      <div className="final-glow" aria-hidden="true" />
-      <div className="final-confetti" aria-hidden="true">
-        <span>✦</span>
-        <span>♥</span>
-        <span>✧</span>
-        <span>♥</span>
+    <>
+      <div className="final-hero">
+        <img
+          src="/final-cuddle-cats.png"
+          alt="Two cats cuddling with their tails forming a heart"
+          width="150"
+          height="150"
+        />
+        <span aria-hidden="true">💞</span>
       </div>
 
-      <motion.section
-        layout
-        layoutId="valentine-modal"
-        transition={{ layout: modalLayoutTransition }}
-        className="final-card"
-        aria-labelledby="final-title"
-      >
-        <div className="final-hero">
-          <img
-            src="/final-cuddle-cats.png"
-            alt="Two cats cuddling with their tails forming a heart"
-            width="150"
-            height="150"
-          />
-          <span aria-hidden="true">💞</span>
+      <header className="final-header">
+        <p className="eyebrow">Officially official</p>
+        <h1 id="final-title">It’s a date.</h1>
+        <p className="final-compliment">
+          I’ll be the happiest person you’ve ever seen <span>✨</span>
+        </p>
+        <p className="final-subtitle">
+          You can’t cancel btw — the cats have already been informed.
+        </p>
+      </header>
+
+      <div className="date-receipt" aria-label="Your date plan">
+        <div className="receipt-section">
+          <p className="receipt-label">
+            <span aria-hidden="true">//</span> Date
+          </p>
+          <p className="receipt-value">{dayName}</p>
+          <p className="receipt-detail">{fullDate}</p>
+          <p className="receipt-detail">at {schedule.time}</p>
         </div>
 
-        <header className="final-header">
-          <p className="eyebrow">Officially official</p>
-          <h1 id="final-title">It’s a date.</h1>
-          <p className="final-compliment">
-            I’ll be the happiest person you’ve ever seen <span>✨</span>
+        <div className="receipt-divider" aria-hidden="true" />
+
+        <div className="receipt-section">
+          <p className="receipt-label">
+            <span aria-hidden="true">//</span> Food
           </p>
-          <p className="final-subtitle">
-            You can’t cancel btw — the cats have already been informed.
-          </p>
-        </header>
+          <div className="receipt-foods">
+            {foods.map((food) => {
+              const foodOption = foodOptions.find(
+                (option) => option.name === food,
+              );
 
-        <div className="date-receipt" aria-label="Your date plan">
-          <div className="receipt-section">
-            <p className="receipt-label">
-              <span aria-hidden="true">//</span> Date
-            </p>
-            <p className="receipt-value">{dayName}</p>
-            <p className="receipt-detail">{fullDate}</p>
-            <p className="receipt-detail">at {schedule.time}</p>
-          </div>
-
-          <div className="receipt-divider" aria-hidden="true" />
-
-          <div className="receipt-section">
-            <p className="receipt-label">
-              <span aria-hidden="true">//</span> Food
-            </p>
-            <div className="receipt-foods">
-              {foods.map((food) => {
-                const foodOption = foodOptions.find(
-                  (option) => option.name === food,
-                );
-
-                return (
-                  <span className="receipt-food" key={food}>
-                    <span aria-hidden="true">{foodOption?.emoji ?? "🍽️"}</span>
-                    {food}
-                  </span>
-                );
-              })}
-            </div>
+              return (
+                <span className="receipt-food" key={food}>
+                  <span aria-hidden="true">{foodOption?.emoji ?? "🍽️"}</span>
+                  {food}
+                </span>
+              );
+            })}
           </div>
         </div>
+      </div>
 
-        <div className="approval-cat-shell">
-          <img
-            src="/final-approval-cat.png"
-            alt="An orange tabby giving an enthusiastic thumbs-up"
-            width="92"
-            height="92"
-          />
-        </div>
+      <div className="approval-cat-shell">
+        <img
+          src="/final-approval-cat.png"
+          alt="An orange tabby giving an enthusiastic thumbs-up"
+          width="92"
+          height="92"
+        />
+      </div>
 
-        <p className="final-note">
-          p.s. this is officially production-ready, so there’s no taking it
-          back <span aria-hidden="true">💌</span>
-        </p>
-        <p className="final-signoff">
-          made with <span aria-hidden="true">♥</span> and excellent taste
-        </p>
-      </motion.section>
-    </main>
+      <p className="final-note">
+        p.s. this is officially production-ready, so there’s no taking it back{" "}
+        <span aria-hidden="true">💌</span>
+      </p>
+      <p className="final-signoff">
+        made with <span aria-hidden="true">♥</span> and excellent taste
+      </p>
+    </>
   );
 }
 
@@ -752,12 +724,121 @@ function BackgroundDecorations() {
   );
 }
 
+function ScreenDecorations({ screen }: { screen: Screen }) {
+  if (screen === "question") {
+    return <BackgroundDecorations />;
+  }
+
+  if (screen === "celebration") {
+    return (
+      <>
+        <div className="celebration-glow" aria-hidden="true" />
+        <div className="confetti-layer" aria-hidden="true">
+          <span className="confetti confetti-one">◆</span>
+          <span className="confetti confetti-two">●</span>
+          <span className="confetti confetti-three">★</span>
+          <span className="confetti confetti-four">◆</span>
+          <span className="confetti confetti-five">●</span>
+          <span className="confetti confetti-six">★</span>
+        </div>
+      </>
+    );
+  }
+
+  if (screen === "schedule") {
+    return <div className="schedule-glow" aria-hidden="true" />;
+  }
+
+  if (screen === "food") {
+    return <div className="food-glow" aria-hidden="true" />;
+  }
+
+  return (
+    <>
+      <div className="final-glow" aria-hidden="true" />
+      <div className="final-confetti" aria-hidden="true">
+        <span>✦</span>
+        <span>♥</span>
+        <span>✧</span>
+        <span>♥</span>
+      </div>
+    </>
+  );
+}
+
+function MeasuredModalContent({
+  screen,
+  children,
+  onHeightReady,
+  onTransitionComplete,
+}: {
+  screen: Screen;
+  children: ReactNode;
+  onHeightReady: (screen: Screen, height: number) => void;
+  onTransitionComplete: () => void;
+}) {
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const content = contentRef.current;
+    const modal = content?.parentElement;
+    const viewport = content?.closest<HTMLElement>(".modal-viewport");
+
+    if (!content || !modal || !viewport) {
+      return;
+    }
+
+    const reportHeight = () => {
+      const modalStyles = getComputedStyle(modal);
+      const viewportStyles = getComputedStyle(viewport);
+      const modalBorderHeight =
+        Number.parseFloat(modalStyles.borderTopWidth) +
+        Number.parseFloat(modalStyles.borderBottomWidth);
+      const availableHeight =
+        viewport.clientHeight -
+        Number.parseFloat(viewportStyles.paddingTop) -
+        Number.parseFloat(viewportStyles.paddingBottom);
+      const contentHeight = content.offsetHeight + modalBorderHeight;
+
+      onHeightReady(screen, Math.min(contentHeight, availableHeight));
+    };
+    reportHeight();
+
+    const observer = new ResizeObserver(reportHeight);
+    observer.observe(content);
+    observer.observe(viewport);
+
+    return () => observer.disconnect();
+  }, [onHeightReady, screen]);
+
+  return (
+    <motion.div
+      ref={contentRef}
+      className="modal-content-stage"
+      data-screen={screen}
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={contentTransition}
+      onAnimationComplete={onTransitionComplete}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 export default function App() {
   const [screen, setScreen] = useState<Screen>("question");
-  const [scheduleChoice, setScheduleChoice] =
-    useState<ScheduleChoice | null>(null);
+  const [scheduleChoice, setScheduleChoice] = useState<ScheduleChoice | null>(
+    null,
+  );
   const [foodChoices, setFoodChoices] = useState<string[]>([]);
+  const [modalHeight, setModalHeight] = useState<number | null>(null);
+  const modalRef = useRef<HTMLElement>(null);
+  const currentScreenRef = useRef(screen);
+  const measuredHeightRef = useRef<number | null>(null);
   const activeTransitionRef = useRef(false);
+  currentScreenRef.current = screen;
 
   useEffect(() => {
     const nextScreen = screenSequence[screenSequence.indexOf(screen) + 1];
@@ -794,51 +875,87 @@ export default function App() {
     [],
   );
 
+  const handleHeightReady = useCallback(
+    (measuredScreen: Screen, height: number) => {
+      if (measuredScreen !== currentScreenRef.current) {
+        return;
+      }
+
+      if (measuredHeightRef.current === null && modalRef.current) {
+        modalRef.current.style.height = `${height}px`;
+      }
+
+      measuredHeightRef.current = height;
+      setModalHeight(height);
+    },
+    [],
+  );
+
+  const currentPresentation = screenPresentation[screen];
+
+  const currentContent =
+    screen === "question" ? (
+      <QuestionContent
+        cardRef={modalRef}
+        onYes={() => navigate("celebration")}
+      />
+    ) : screen === "celebration" ? (
+      <CelebrationContent onContinue={() => navigate("schedule")} />
+    ) : screen === "schedule" ? (
+      <ScheduleContent
+        onContinue={(choice) => {
+          navigate("food", () => setScheduleChoice(choice));
+        }}
+      />
+    ) : screen === "food" ? (
+      <FoodContent
+        onContinue={(foods) => {
+          navigate("final", () => setFoodChoices(foods));
+        }}
+      />
+    ) : scheduleChoice ? (
+      <FinalContent schedule={scheduleChoice} foods={foodChoices} />
+    ) : null;
+
   return (
     <div className="app-shell">
       <MotionConfig reducedMotion="user">
-        <LayoutGroup id="valentine-flow">
-          <AnimatePresence initial={false} mode="sync">
-            <motion.div
-              className="screen-stage"
-              key={screen}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={screenFadeTransition}
-              onAnimationComplete={() => {
-                activeTransitionRef.current = false;
-              }}
-            >
-              {screen === "question" && (
-                <QuestionScreen onYes={() => navigate("celebration")} />
-              )}
-              {screen === "celebration" && (
-                <CelebrationScreen onContinue={() => navigate("schedule")} />
-              )}
-              {screen === "schedule" && (
-                <ScheduleScreen
-                  onContinue={(choice) => {
-                    navigate("food", () => setScheduleChoice(choice));
-                  }}
-                />
-              )}
-              {screen === "food" && (
-                <FoodScreen
-                  onContinue={(foods) => {
-                    navigate("final", () => setFoodChoices(foods));
-                  }}
-                />
-              )}
-              {screen === "final" && scheduleChoice && (
-                <FinalScreen
-                  schedule={scheduleChoice}
-                  foods={foodChoices}
-                />
-              )}
-            </motion.div>
-          </AnimatePresence>
-        </LayoutGroup>
+        <AnimatePresence initial={false} mode="sync">
+          <motion.div
+            className={`screen-stage valentine-page ${currentPresentation.pageClass}`}
+            key={screen}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={screenFadeTransition}
+          >
+            <ScreenDecorations screen={screen} />
+          </motion.div>
+        </AnimatePresence>
+
+        <main className="modal-viewport" data-screen={screen}>
+          <motion.section
+            ref={modalRef}
+            className={`persistent-modal ${currentPresentation.cardClass}`}
+            aria-labelledby={currentPresentation.labelledBy}
+            initial={false}
+            animate={modalHeight === null ? undefined : { height: modalHeight }}
+            transition={{ height: modalLayoutTransition }}
+          >
+            <AnimatePresence initial={false} mode="sync">
+              <MeasuredModalContent
+                key={screen}
+                screen={screen}
+                onHeightReady={handleHeightReady}
+                onTransitionComplete={() => {
+                  activeTransitionRef.current = false;
+                }}
+              >
+                {currentContent}
+              </MeasuredModalContent>
+            </AnimatePresence>
+          </motion.section>
+        </main>
       </MotionConfig>
     </div>
   );

@@ -66,11 +66,68 @@ button {
 .screen-stage {
   position: absolute;
   inset: 0;
+  z-index: 0;
   width: 100%;
   height: 100%;
   min-height: 0;
   overflow: hidden;
+  pointer-events: none;
   will-change: opacity;
+}
+
+.modal-viewport {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  place-items: center;
+  overflow: hidden;
+  padding: clamp(20px, 5vw, 64px) 16px;
+}
+
+.persistent-modal {
+  flex: none;
+  padding: 0;
+  transition:
+    width 560ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 420ms ease,
+    background-color 420ms ease,
+    box-shadow 480ms ease,
+    backdrop-filter 420ms ease;
+  will-change: width, height;
+}
+
+.modal-content-stage {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--modal-padding);
+}
+
+.modal-content-stage[data-screen="question"],
+.modal-content-stage[data-screen="celebration"] {
+  --modal-padding: clamp(38px, 6vh, 58px) clamp(26px, 7vw, 56px) 32px;
+}
+
+.modal-content-stage[data-screen="schedule"] {
+  --modal-padding: clamp(34px, 5vw, 52px) clamp(22px, 6vw, 58px) 28px;
+}
+
+.modal-content-stage[data-screen="food"] {
+  --modal-padding: clamp(32px, 5vw, 48px) clamp(24px, 6vw, 54px) 26px;
+}
+
+.modal-content-stage[data-screen="final"] {
+  --modal-padding: clamp(30px, 5vw, 46px) clamp(24px, 6vw, 54px) 24px;
 }
 
 .valentine-page {
@@ -160,13 +217,14 @@ button {
 }
 
 .proposal-card {
+  --modal-padding: clamp(38px, 6vh, 58px) clamp(26px, 7vw, 56px) 32px;
   position: relative;
   display: flex;
   width: min(480px, calc(100vw - 32px));
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: clamp(38px, 6vh, 58px) clamp(26px, 7vw, 56px) 32px;
+  padding: 0;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.72);
   border-radius: clamp(26px, 5vw, 36px);
@@ -215,13 +273,14 @@ button {
 .schedule-card,
 .food-card,
 .final-card {
+  --modal-padding: clamp(34px, 5vw, 52px) clamp(22px, 6vw, 58px) 28px;
   position: relative;
   display: flex;
   width: min(590px, calc(100vw - 32px));
   max-height: 100%;
   flex-direction: column;
   align-items: center;
-  padding: clamp(34px, 5vw, 52px) clamp(22px, 6vw, 58px) 28px;
+  padding: 0;
   overflow-x: hidden;
   overflow-y: auto;
   border: 1px solid rgba(255, 255, 255, 0.8);
@@ -242,8 +301,8 @@ button {
 }
 
 .food-card {
+  --modal-padding: clamp(32px, 5vw, 48px) clamp(24px, 6vw, 54px) 26px;
   width: min(610px, calc(100vw - 32px));
-  padding: clamp(32px, 5vw, 48px) clamp(24px, 6vw, 54px) 26px;
   border-color: rgba(255, 255, 255, 0.84);
   background: rgba(255, 253, 251, 0.91);
   box-shadow:
@@ -253,8 +312,8 @@ button {
 }
 
 .final-card {
+  --modal-padding: clamp(30px, 5vw, 46px) clamp(24px, 6vw, 54px) 24px;
   width: min(600px, calc(100vw - 32px));
-  padding: clamp(30px, 5vw, 46px) clamp(24px, 6vw, 54px) 24px;
   border-color: rgba(255, 255, 255, 0.86);
   background: rgba(255, 253, 255, 0.92);
   box-shadow:
@@ -670,8 +729,10 @@ button {
 .food-option.is-selected {
   transform: translateY(-2px);
   border-color: rgba(225, 42, 105, 0.5);
-  background:
-    linear-gradient(rgba(255, 244, 248, 0.91), rgba(255, 235, 241, 0.87));
+  background: linear-gradient(
+    rgba(255, 244, 248, 0.91),
+    rgba(255, 235, 241, 0.87)
+  );
   box-shadow:
     0 14px 28px rgba(187, 45, 96, 0.13),
     inset 0 0 0 1px rgba(245, 111, 153, 0.2);
@@ -873,8 +934,11 @@ button {
   padding: 22px 24px;
   border: 1px solid rgba(158, 108, 129, 0.15);
   border-radius: 23px;
-  background:
-    linear-gradient(145deg, rgba(255, 245, 249, 0.8), rgba(250, 238, 245, 0.64));
+  background: linear-gradient(
+    145deg,
+    rgba(255, 245, 249, 0.8),
+    rgba(250, 238, 245, 0.64)
+  );
   box-shadow:
     0 12px 30px rgba(115, 67, 88, 0.07),
     inset 0 1px 0 rgba(255, 255, 255, 0.86);
@@ -1394,11 +1458,24 @@ h1 {
     padding: 18px 14px;
   }
 
+  .modal-viewport {
+    padding: 18px 14px;
+  }
+
+  .modal-viewport[data-screen="schedule"],
+  .modal-viewport[data-screen="food"],
+  .modal-viewport[data-screen="final"] {
+    padding: 16px 12px;
+  }
+
   .proposal-card {
     width: min(100%, 420px);
-    padding-right: 24px;
-    padding-left: 24px;
     border-radius: 28px;
+  }
+
+  .modal-content-stage[data-screen="question"],
+  .modal-content-stage[data-screen="celebration"] {
+    --modal-padding: clamp(38px, 6vh, 58px) 24px 32px;
   }
 
   .schedule-page {
@@ -1418,20 +1495,29 @@ h1 {
 
   .schedule-card {
     width: min(100%, 430px);
-    padding: 30px 17px 22px;
     border-radius: 28px;
+  }
+
+  .modal-content-stage[data-screen="schedule"] {
+    --modal-padding: 30px 17px 22px;
   }
 
   .food-card {
     width: min(100%, 440px);
-    padding: 27px 17px 21px;
     border-radius: 28px;
+  }
+
+  .modal-content-stage[data-screen="food"] {
+    --modal-padding: 27px 17px 21px;
   }
 
   .final-card {
     width: min(100%, 440px);
-    padding: 27px 17px 20px;
     border-radius: 28px;
+  }
+
+  .modal-content-stage[data-screen="final"] {
+    --modal-padding: 27px 17px 20px;
   }
 
   .final-hero {
@@ -1517,11 +1603,14 @@ h1 {
     padding-bottom: 14px;
   }
 
+  .modal-viewport {
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+
   .proposal-card {
     max-height: 100%;
     justify-content: flex-start;
-    padding-top: 24px;
-    padding-bottom: 24px;
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
@@ -1529,6 +1618,11 @@ h1 {
     scrollbar-gutter: stable;
     scrollbar-width: thin;
     -webkit-overflow-scrolling: touch;
+  }
+
+  .modal-content-stage[data-screen="question"],
+  .modal-content-stage[data-screen="celebration"] {
+    --modal-padding: 24px clamp(26px, 7vw, 56px);
   }
 
   .portrait-shell {
