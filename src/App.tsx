@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 
 const decorations = [
   { className: "heart heart-one", symbol: "♥" },
@@ -39,9 +40,38 @@ const foodOptions = [
 
 type Screen = "question" | "celebration" | "schedule" | "food" | "final";
 
+type ViewTransitionDocument = Document & {
+  startViewTransition?: (update: () => void) => {
+    finished: Promise<void>;
+  };
+};
+
 type ScheduleChoice = {
   date: Date;
   time: string;
+};
+
+const screenSequence: Screen[] = [
+  "question",
+  "celebration",
+  "schedule",
+  "food",
+  "final",
+];
+
+const screenAssets: Record<Screen, string[]> = {
+  question: ["/valentine-watercolor-bg.png", "/shy-kitten.png"],
+  celebration: [
+    "/celebration-watercolor-bg.png",
+    "/celebration-cat.png",
+  ],
+  schedule: ["/schedule-watercolor-bg.png"],
+  food: ["/food-watercolor-bg.png", "/food-picker-cat.png"],
+  final: [
+    "/celebration-watercolor-bg.png",
+    "/final-cuddle-cats.png",
+    "/final-approval-cat.png",
+  ],
 };
 
 function QuestionScreen({ onYes }: { onYes: () => void }) {
@@ -691,28 +721,102 @@ export default function App() {
   const [scheduleChoice, setScheduleChoice] =
     useState<ScheduleChoice | null>(null);
   const [foodChoices, setFoodChoices] = useState<string[]>([]);
+  const activeTransitionRef = useRef(false);
+
+  useEffect(() => {
+    const transitionDocument = document as ViewTransitionDocument;
+
+    if (typeof transitionDocument.startViewTransition !== "function") {
+      return;
+    }
+
+    document.documentElement.classList.add("supports-view-transitions");
+    return () => {
+      document.documentElement.classList.remove("supports-view-transitions");
+    };
+  }, []);
+
+  useEffect(() => {
+    const nextScreen = screenSequence[screenSequence.indexOf(screen) + 1];
+
+    if (!nextScreen) {
+      return;
+    }
+
+    const preloaders = screenAssets[nextScreen].map((source) => {
+      const image = new Image();
+      image.decoding = "async";
+      image.src = source;
+      return image;
+    });
+
+    return () => {
+      preloaders.forEach((image) => {
+        image.onload = null;
+        image.onerror = null;
+      });
+    };
+  }, [screen]);
+
+  const navigate = useCallback(
+    (nextScreen: Screen, updateBeforeNavigation?: () => void) => {
+      const commitNavigation = () => {
+        updateBeforeNavigation?.();
+        setScreen(nextScreen);
+      };
+      const transitionDocument = document as ViewTransitionDocument;
+      const prefersReducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+
+      if (
+        prefersReducedMotion ||
+        typeof transitionDocument.startViewTransition !== "function"
+      ) {
+        commitNavigation();
+        return;
+      }
+
+      if (activeTransitionRef.current) {
+        return;
+      }
+
+      activeTransitionRef.current = true;
+      document.documentElement.classList.add("is-screen-transitioning");
+
+      const transition = transitionDocument.startViewTransition(() => {
+        flushSync(commitNavigation);
+      });
+
+      const finishTransition = () => {
+        activeTransitionRef.current = false;
+        document.documentElement.classList.remove("is-screen-transitioning");
+      };
+
+      void transition.finished.then(finishTransition, finishTransition);
+    },
+    [],
+  );
 
   return (
     <div className="app-shell" key={screen}>
       {screen === "question" && (
-        <QuestionScreen onYes={() => setScreen("celebration")} />
+        <QuestionScreen onYes={() => navigate("celebration")} />
       )}
       {screen === "celebration" && (
-        <CelebrationScreen onContinue={() => setScreen("schedule")} />
+        <CelebrationScreen onContinue={() => navigate("schedule")} />
       )}
       {screen === "schedule" && (
         <ScheduleScreen
           onContinue={(choice) => {
-            setScheduleChoice(choice);
-            setScreen("food");
+            navigate("food", () => setScheduleChoice(choice));
           }}
         />
       )}
       {screen === "food" && (
         <FoodScreen
           onContinue={(foods) => {
-            setFoodChoices(foods);
-            setScreen("final");
+            navigate("final", () => setFoodChoices(foods));
           }}
         />
       )}

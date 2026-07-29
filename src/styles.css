@@ -4,6 +4,8 @@
   --rose: #e93275;
   --rose-dark: #ca245f;
   --card: rgba(255, 253, 255, 0.88);
+  --screen-transition-duration: 760ms;
+  --screen-transition-ease: cubic-bezier(0.22, 1, 0.36, 1);
   color: var(--ink);
   background: #f8c4c6;
   font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
@@ -60,7 +62,47 @@ button {
   height: 100%;
   min-height: 0;
   overflow: hidden;
+  view-transition-name: valentine-screen;
   animation: screen-arrival 540ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+html.supports-view-transitions .app-shell {
+  animation: none;
+}
+
+html.is-screen-transitioning {
+  pointer-events: none;
+  user-select: none;
+}
+
+::view-transition-group(valentine-screen) {
+  z-index: 100;
+  animation-duration: var(--screen-transition-duration);
+  animation-timing-function: var(--screen-transition-ease);
+}
+
+::view-transition-image-pair(valentine-screen) {
+  isolation: isolate;
+}
+
+::view-transition-old(valentine-screen),
+::view-transition-new(valentine-screen) {
+  width: 100%;
+  height: 100%;
+  transform-origin: center;
+  backface-visibility: hidden;
+  mix-blend-mode: normal;
+  will-change: opacity, transform, filter;
+}
+
+::view-transition-old(valentine-screen) {
+  animation: screen-layer-exit var(--screen-transition-duration)
+    var(--screen-transition-ease) both;
+}
+
+::view-transition-new(valentine-screen) {
+  animation: screen-layer-enter var(--screen-transition-duration)
+    var(--screen-transition-ease) both;
 }
 
 .valentine-page {
@@ -1363,11 +1405,42 @@ h1 {
 @keyframes screen-arrival {
   from {
     opacity: 0;
-    transform: scale(0.985);
+    filter: blur(7px) saturate(1.04);
+    transform: translateY(8px) scale(0.988);
   }
   to {
     opacity: 1;
+    filter: blur(0) saturate(1);
     transform: scale(1);
+  }
+}
+
+@keyframes screen-layer-exit {
+  0% {
+    opacity: 1;
+    filter: blur(0) saturate(1);
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    filter: blur(8px) saturate(0.92);
+    transform: scale(1.024);
+  }
+}
+
+@keyframes screen-layer-enter {
+  0% {
+    opacity: 0;
+    filter: blur(10px) saturate(1.06) brightness(1.04);
+    transform: translateY(10px) scale(0.982);
+  }
+  58% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0) saturate(1) brightness(1);
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -1604,6 +1677,11 @@ h1 {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(valentine-screen),
+  ::view-transition-new(valentine-screen) {
+    animation: none !important;
+  }
+
   *,
   *::before,
   *::after {
