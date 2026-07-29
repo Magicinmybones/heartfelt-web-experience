@@ -16,15 +16,28 @@
 }
 
 html {
+  width: 100%;
+  height: 100%;
   min-width: 280px;
+  overflow: hidden;
   background: #f8c4c6;
 }
 
 body {
+  width: 100%;
+  height: 100%;
   min-width: 280px;
-  min-height: 100vh;
+  min-height: 0;
   margin: 0;
+  overflow: hidden;
   background: #f8c4c6;
+  overscroll-behavior: none;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
 button {
@@ -43,7 +56,10 @@ button {
 }
 
 .app-shell {
-  min-height: 100svh;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
   animation: screen-arrival 540ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
 }
 
@@ -51,7 +67,9 @@ button {
   position: relative;
   isolation: isolate;
   display: grid;
-  min-height: 100svh;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
   place-items: center;
   overflow: hidden;
   padding: clamp(20px, 5vw, 64px) 16px;
@@ -70,8 +88,8 @@ button {
 }
 
 .schedule-page {
-  min-height: 100svh;
-  overflow-y: auto;
+  min-height: 0;
+  overflow: hidden;
   padding-block: clamp(28px, 5vw, 64px);
   background:
     linear-gradient(rgba(255, 247, 247, 0.16), rgba(247, 194, 207, 0.2)),
@@ -159,10 +177,12 @@ button {
   position: relative;
   display: flex;
   width: min(590px, calc(100vw - 32px));
+  max-height: 100%;
   flex-direction: column;
   align-items: center;
   padding: clamp(34px, 5vw, 52px) clamp(22px, 6vw, 58px) 28px;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   border: 1px solid rgba(255, 255, 255, 0.8);
   border-radius: clamp(26px, 5vw, 38px);
   background: rgba(255, 253, 255, 0.89);
@@ -173,6 +193,43 @@ button {
   text-align: center;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  overscroll-behavior: contain;
+  scrollbar-color: rgba(217, 49, 108, 0.62) rgba(255, 255, 255, 0.18);
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+.schedule-card::-webkit-scrollbar,
+.proposal-card::-webkit-scrollbar {
+  width: 10px;
+}
+
+.schedule-card::-webkit-scrollbar-track,
+.proposal-card::-webkit-scrollbar-track {
+  margin-block: 22px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.schedule-card::-webkit-scrollbar-thumb,
+.proposal-card::-webkit-scrollbar-thumb {
+  min-height: 52px;
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #f47b9e, #d92e6b);
+  background-clip: padding-box;
+}
+
+.schedule-card::-webkit-scrollbar-thumb:hover,
+.proposal-card::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #ed5f8b, #c8215c);
+  background-clip: padding-box;
+}
+
+.schedule-card::-webkit-scrollbar-corner,
+.proposal-card::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 .schedule-card::before {
@@ -904,15 +961,24 @@ h1 {
 
 @media (max-height: 690px) {
   .valentine-page {
-    overflow-y: auto;
+    overflow: hidden;
     padding-top: 14px;
     padding-bottom: 14px;
   }
 
   .proposal-card {
+    max-height: 100%;
     min-height: min(580px, calc(100svh - 28px));
+    justify-content: flex-start;
     padding-top: 24px;
     padding-bottom: 24px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-color: rgba(217, 49, 108, 0.62) rgba(255, 255, 255, 0.18);
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
   }
 
   .portrait-shell {
