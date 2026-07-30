@@ -48,7 +48,6 @@ occupied, it selects the next available port.
 ```text
 .
 ├── .github/workflows/   # Continuous integration
-├── .openai/             # Sites project metadata
 ├── build/               # Build-time Vite integration
 ├── public/              # Optimized images and static assets
 ├── scripts/             # Build preparation utilities
@@ -75,11 +74,9 @@ so each section can evolve without expanding the application shell.
 
 ## Deployment
 
-The repository contains both deployment configurations used by the project:
-
-- `vercel.json` builds the Vite client and preserves SPA routing on Vercel.
-- `.openai/hosting.json`, `worker/`, `build/`, and `scripts/` produce the
-  Cloudflare-compatible package used by OpenAI Sites.
+`vercel.json` builds the Vite client and preserves SPA routing on Vercel.
+Additional local hosting metadata is intentionally excluded from version
+control.
 
 Run `npm run build` before publishing. Generated output is written to `dist/`
 and is intentionally excluded from Git.

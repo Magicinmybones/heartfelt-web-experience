@@ -15,6 +15,7 @@ work/
 .env.*
 !.env.example
 *.local
+.openai/
 
 # Logs
 npm-debug.log*
