@@ -120,6 +120,10 @@ button {
   overflow-y: hidden;
 }
 
+.modal-viewport[data-screen="final"] .card-scroll-region {
+  overflow-y: hidden;
+}
+
 .modal-content-stage {
   position: relative;
   display: flex;
@@ -1763,6 +1767,109 @@ h1 {
   }
 }
 
+@media (max-height: 900px) {
+  .modal-content-stage[data-screen="final"] {
+    --modal-padding: 16px clamp(16px, 4vw, 28px) 12px;
+  }
+
+  .final-hero {
+    width: 80px;
+    padding: 3px;
+    border-radius: 20px;
+  }
+
+  .final-hero img {
+    border-radius: 17px;
+  }
+
+  .final-hero > span {
+    right: -9px;
+    bottom: -6px;
+    width: 30px;
+    height: 30px;
+    border-width: 2px;
+    font-size: 13px;
+  }
+
+  .final-header {
+    gap: 4px;
+    margin-top: 12px;
+  }
+
+  .final-header h1 {
+    font-size: clamp(1.65rem, 4.4vh, 1.9rem);
+  }
+
+  .final-compliment {
+    font-size: 0.82rem;
+    line-height: 1.3;
+  }
+
+  .final-subtitle {
+    font-size: 0.72rem;
+    line-height: 1.3;
+  }
+
+  .date-receipt {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 17px;
+  }
+
+  .receipt-label {
+    font-size: 0.58rem;
+  }
+
+  .receipt-value {
+    margin-top: 5px !important;
+    font-size: 1rem;
+  }
+
+  .receipt-detail {
+    margin-top: 2px !important;
+    font-size: 0.72rem;
+  }
+
+  .receipt-divider {
+    margin: 9px 0;
+  }
+
+  .receipt-foods {
+    gap: 6px;
+    margin-top: 7px;
+  }
+
+  .receipt-food {
+    min-height: 26px;
+    gap: 5px;
+    padding: 3px 8px;
+    font-size: 0.68rem;
+  }
+
+  .approval-cat-shell {
+    width: 50px;
+    margin-top: 12px;
+    padding: 3px;
+    border-radius: 16px;
+  }
+
+  .approval-cat-shell img {
+    border-radius: 13px;
+  }
+
+  .final-note {
+    margin-top: 8px;
+    font-size: 0.66rem;
+    line-height: 1.35;
+  }
+
+  .final-signoff {
+    margin-top: 10px;
+    padding-top: 8px;
+    font-size: 0.61rem;
+  }
+}
+
 @media (max-height: 690px) {
   :root {
     --title-size: clamp(1.65rem, 5.4vh, 2.1rem);
@@ -1893,6 +2000,92 @@ h1 {
     min-height: 14px;
     margin-top: 4px;
     font-size: 0.68rem;
+  }
+
+  .modal-content-stage[data-screen="final"] {
+    --modal-padding: 10px 10px 8px;
+  }
+
+  .final-hero {
+    width: 60px;
+    border-radius: 16px;
+  }
+
+  .final-hero img {
+    border-radius: 13px;
+  }
+
+  .final-hero > span {
+    right: -7px;
+    bottom: -5px;
+    width: 25px;
+    height: 25px;
+    font-size: 11px;
+  }
+
+  .final-header {
+    gap: 3px;
+    margin-top: 8px;
+  }
+
+  .final-header h1 {
+    font-size: clamp(1.45rem, 4.6vh, 1.65rem);
+  }
+
+  .final-compliment {
+    font-size: 0.74rem;
+    line-height: 1.2;
+  }
+
+  .final-subtitle {
+    font-size: 0.64rem;
+    line-height: 1.2;
+  }
+
+  .date-receipt {
+    margin-top: 10px;
+    padding: 9px 10px;
+    border-radius: 14px;
+  }
+
+  .receipt-value {
+    font-size: 0.9rem;
+  }
+
+  .receipt-detail {
+    font-size: 0.66rem;
+  }
+
+  .receipt-divider {
+    margin: 7px 0;
+  }
+
+  .receipt-foods {
+    gap: 4px;
+    margin-top: 5px;
+  }
+
+  .receipt-food {
+    min-height: 22px;
+    padding: 2px 6px;
+    font-size: 0.62rem;
+  }
+
+  .approval-cat-shell {
+    width: 44px;
+    margin-top: 8px;
+  }
+
+  .final-note {
+    margin-top: 5px;
+    font-size: 0.6rem;
+    line-height: 1.25;
+  }
+
+  .final-signoff {
+    margin-top: 6px;
+    padding-top: 6px;
+    font-size: 0.56rem;
   }
 
   .supporting-copy {
