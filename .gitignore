@@ -1,35 +1,37 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Dependencies
+node_modules/
 
-# dependencies
-/node_modules
-/.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
+# Generated output
+dist/
+coverage/
+.vite/
+.wrangler/
+.vercel/
+outputs/
+work/
 
-# build output
-/dist/
+# Local environment
+.env
+.env.*
+!.env.example
+*.local
 
-# misc
-.DS_Store
-*.pem
-
-# debug
+# Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.pnpm-debug.log*
-.vite-dev*.log
+pnpm-debug.log*
+*.log
 
-# env files (can opt-in for committing if needed)
-.env*
+# Operating system and editor files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
 
-# vercel
-.vercel
-
-/.wrangler/
-/outputs/
-/work/
+# Local credentials and archives
+*.pem
+*.tgz
+*.tar.gz

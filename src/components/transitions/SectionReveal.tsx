@@ -1,12 +1,6 @@
 import type { CSSProperties } from "react";
 import { AnimatePresence, motion } from "motion/react";
-
-export type RevealSection =
-  | "question"
-  | "celebration"
-  | "schedule"
-  | "food"
-  | "final";
+import type { Screen } from "../../app/types";
 
 type RevealMotif = "petal" | "ribbon" | "orbit" | "steam" | "vow" | "spark";
 
@@ -51,7 +45,7 @@ type RevealParticleStyle = CSSProperties & {
   "--reveal-duration": string;
 };
 
-const revealSequence: RevealSection[] = [
+const revealSequence: Screen[] = [
   "question",
   "celebration",
   "schedule",
@@ -59,7 +53,7 @@ const revealSequence: RevealSection[] = [
   "final",
 ];
 
-const revealThemes: Record<RevealSection, RevealTheme> = {
+const revealThemes: Record<Screen, RevealTheme> = {
   question: {
     seed: 143,
     palette: ["#ef6f91", "#f6b0aa", "#fff0d1"],
@@ -105,7 +99,7 @@ function createSeededRandom(seed: number) {
 }
 
 function createRevealParticles(
-  section: RevealSection,
+  section: Screen,
   theme: RevealTheme,
 ): RevealParticle[] {
   const random = createSeededRandom(theme.seed);
@@ -137,9 +131,9 @@ const revealParticles = Object.fromEntries(
     section,
     createRevealParticles(section, revealThemes[section]),
   ]),
-) as Record<RevealSection, RevealParticle[]>;
+) as Record<Screen, RevealParticle[]>;
 
-export function SectionReveal({ screen }: { screen: RevealSection }) {
+export function SectionReveal({ screen }: { screen: Screen }) {
   const theme = revealThemes[screen];
   const rootStyle: RevealRootStyle = {
     "--reveal-primary": theme.palette[0],
