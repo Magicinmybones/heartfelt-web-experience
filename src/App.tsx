@@ -771,10 +771,11 @@ export default function App() {
   );
   const [foodChoices, setFoodChoices] = useState<string[]>([]);
   const modalRef = useRef<HTMLElement>(null);
+  const scrollRegionRef = useRef<HTMLDivElement>(null);
   const activeTransitionRef = useRef(false);
 
   useLayoutEffect(() => {
-    modalRef.current?.scrollTo({ top: 0, left: 0 });
+    scrollRegionRef.current?.scrollTo({ top: 0, left: 0 });
   }, [screen]);
 
   useEffect(() => {
@@ -863,23 +864,25 @@ export default function App() {
             initial={false}
             transition={{ layout: modalLayoutTransition }}
           >
-            <AnimatePresence initial={false} mode="popLayout">
-              <motion.div
-                layout="position"
-                key={screen}
-                className="modal-content-stage"
-                data-screen={screen}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={contentTransition}
-                onAnimationComplete={() => {
-                  activeTransitionRef.current = false;
-                }}
-              >
-                {currentContent}
-              </motion.div>
-            </AnimatePresence>
+            <div className="card-scroll-region" ref={scrollRegionRef}>
+              <AnimatePresence initial={false} mode="popLayout">
+                <motion.div
+                  layout="position"
+                  key={screen}
+                  className="modal-content-stage"
+                  data-screen={screen}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={contentTransition}
+                  onAnimationComplete={() => {
+                    activeTransitionRef.current = false;
+                  }}
+                >
+                  {currentContent}
+                </motion.div>
+              </AnimatePresence>
+            </div>
           </motion.section>
         </main>
       </MotionConfig>

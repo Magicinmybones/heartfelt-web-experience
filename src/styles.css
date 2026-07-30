@@ -95,7 +95,25 @@ button {
 .persistent-modal {
   flex: none;
   padding: 0;
+  overflow: hidden;
   will-change: transform;
+}
+
+.card-scroll-region {
+  display: flex;
+  width: calc(100% - 12px);
+  min-height: 0;
+  max-height: calc(100% - 16px);
+  flex: 1 1 auto;
+  flex-direction: column;
+  margin: 8px 6px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  border-radius: inherit;
+  overscroll-behavior: contain;
+  scrollbar-color: rgba(217, 49, 108, 0.62) rgba(255, 255, 255, 0.18);
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
 }
 
 .modal-content-stage {
@@ -281,8 +299,7 @@ button {
   flex-direction: column;
   align-items: center;
   padding: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.8);
   border-radius: clamp(26px, 5vw, 38px);
   background: rgba(255, 253, 255, 0.89);
@@ -293,11 +310,6 @@ button {
   text-align: center;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  overscroll-behavior: contain;
-  scrollbar-color: rgba(217, 49, 108, 0.62) rgba(255, 255, 255, 0.18);
-  scrollbar-gutter: stable;
-  scrollbar-width: thin;
-  -webkit-overflow-scrolling: touch;
 }
 
 .food-card {
@@ -322,26 +334,17 @@ button {
     inset 0 1px 0 rgba(255, 255, 255, 0.96);
 }
 
-.schedule-card::-webkit-scrollbar,
-.proposal-card::-webkit-scrollbar,
-.food-card::-webkit-scrollbar,
-.final-card::-webkit-scrollbar {
+.card-scroll-region::-webkit-scrollbar {
   width: 10px;
 }
 
-.schedule-card::-webkit-scrollbar-track,
-.proposal-card::-webkit-scrollbar-track,
-.food-card::-webkit-scrollbar-track,
-.final-card::-webkit-scrollbar-track {
-  margin-block: 22px;
+.card-scroll-region::-webkit-scrollbar-track {
+  margin-block: 20px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.14);
 }
 
-.schedule-card::-webkit-scrollbar-thumb,
-.proposal-card::-webkit-scrollbar-thumb,
-.food-card::-webkit-scrollbar-thumb,
-.final-card::-webkit-scrollbar-thumb {
+.card-scroll-region::-webkit-scrollbar-thumb {
   min-height: 52px;
   border: 3px solid transparent;
   border-radius: 999px;
@@ -349,18 +352,12 @@ button {
   background-clip: padding-box;
 }
 
-.schedule-card::-webkit-scrollbar-thumb:hover,
-.proposal-card::-webkit-scrollbar-thumb:hover,
-.food-card::-webkit-scrollbar-thumb:hover,
-.final-card::-webkit-scrollbar-thumb:hover {
+.card-scroll-region::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, #ed5f8b, #c8215c);
   background-clip: padding-box;
 }
 
-.schedule-card::-webkit-scrollbar-corner,
-.proposal-card::-webkit-scrollbar-corner,
-.food-card::-webkit-scrollbar-corner,
-.final-card::-webkit-scrollbar-corner {
+.card-scroll-region::-webkit-scrollbar-corner {
   background: transparent;
 }
 
@@ -1656,13 +1653,6 @@ h1 {
   .proposal-card {
     max-height: 100%;
     justify-content: flex-start;
-    overflow-x: hidden;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    scrollbar-color: rgba(217, 49, 108, 0.62) rgba(255, 255, 255, 0.18);
-    scrollbar-gutter: stable;
-    scrollbar-width: thin;
-    -webkit-overflow-scrolling: touch;
   }
 
   .modal-content-stage[data-screen="question"],
