@@ -13,6 +13,7 @@ import {
   motion,
   type Transition,
 } from "motion/react";
+import { SectionReveal, type RevealSection } from "./SectionReveal";
 
 const decorations = [
   { className: "heart heart-one", symbol: "♥" },
@@ -51,7 +52,7 @@ const foodOptions = [
   { name: "Ramen", emoji: "🍜", note: "cozy bowl moment" },
 ];
 
-type Screen = "question" | "celebration" | "schedule" | "food" | "final";
+type Screen = RevealSection;
 
 type ScheduleChoice = {
   date: Date;
@@ -854,6 +855,8 @@ export default function App() {
             <ScreenDecorations screen={screen} />
           </motion.div>
         </AnimatePresence>
+
+        <SectionReveal screen={screen} />
 
         <main className="modal-viewport" data-screen={screen}>
           <motion.section
