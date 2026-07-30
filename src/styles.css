@@ -167,13 +167,13 @@ button {
 .question-page {
   background:
     linear-gradient(rgba(255, 228, 230, 0.12), rgba(248, 176, 182, 0.22)),
-    url("/valentine-watercolor-bg.png") center / cover no-repeat;
+    url("/valentine-watercolor-bg.webp") center / cover no-repeat;
 }
 
 .celebration-page {
   background:
     linear-gradient(rgba(255, 236, 232, 0.06), rgba(247, 173, 181, 0.12)),
-    url("/celebration-watercolor-bg.png") center / cover no-repeat;
+    url("/celebration-watercolor-bg.webp") center / cover no-repeat;
 }
 
 .schedule-page {
@@ -182,7 +182,7 @@ button {
   padding-block: clamp(28px, 5vw, 64px);
   background:
     linear-gradient(rgba(255, 247, 247, 0.16), rgba(247, 194, 207, 0.2)),
-    url("/schedule-watercolor-bg.png") center / cover fixed no-repeat;
+    url("/schedule-watercolor-bg.webp") center / cover fixed no-repeat;
 }
 
 .food-page {
@@ -190,7 +190,7 @@ button {
   overflow: hidden;
   background:
     linear-gradient(rgba(255, 249, 243, 0.12), rgba(247, 191, 198, 0.12)),
-    url("/food-watercolor-bg.png") center / cover fixed no-repeat;
+    url("/food-watercolor-bg.webp") center / cover fixed no-repeat;
 }
 
 .final-page {
@@ -198,7 +198,7 @@ button {
   overflow: hidden;
   background:
     linear-gradient(rgba(255, 243, 246, 0.1), rgba(242, 185, 203, 0.16)),
-    url("/celebration-watercolor-bg.png") center / cover fixed no-repeat;
+    url("/celebration-watercolor-bg.webp") center / cover fixed no-repeat;
 }
 
 .background-glow,

@@ -114,12 +114,12 @@ const screenSequence: Screen[] = [
 ];
 
 const screenAssets: Record<Screen, string[]> = {
-  question: ["/valentine-watercolor-bg.png", "/shy-kitten.png"],
-  celebration: ["/celebration-watercolor-bg.png", "/celebration-cat.png"],
-  schedule: ["/schedule-watercolor-bg.png"],
-  food: ["/food-watercolor-bg.png", "/food-picker-cat.png"],
+  question: ["/valentine-watercolor-bg.webp", "/shy-kitten.png"],
+  celebration: ["/celebration-watercolor-bg.webp", "/celebration-cat.png"],
+  schedule: ["/schedule-watercolor-bg.webp"],
+  food: ["/food-watercolor-bg.webp", "/food-picker-cat.png"],
   final: [
-    "/celebration-watercolor-bg.png",
+    "/celebration-watercolor-bg.webp",
     "/final-cuddle-cats.png",
     "/final-approval-cat.png",
   ],
