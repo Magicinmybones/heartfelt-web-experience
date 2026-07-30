@@ -4,13 +4,14 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=22.13.0"
+    "node": "22.x"
   },
   "scripts": {
     "clean": "node scripts/clean-dist.mjs",
     "dev": "vite --host 0.0.0.0",
     "typecheck": "tsc --noEmit",
-    "build": "npm run clean && npm run typecheck && vite build && node scripts/prepare-sites-build.mjs",
+    "build": "npm run clean && npm run typecheck && vite build",
+    "build:sites": "npm run build && node scripts/prepare-sites-build.mjs",
     "preview": "vite preview --host 0.0.0.0"
   },
   "dependencies": {

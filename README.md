@@ -11,7 +11,7 @@ and food selection to a personalized confirmation.
 - Section-specific watercolor backgrounds and transition celebrations
 - Interactive date, time, and food selection
 - Static SPA routing support for Vercel
-- Cloudflare-compatible output for OpenAI Sites
+- Cloudflare-compatible server output
 
 ## Technology
 
@@ -23,7 +23,7 @@ and food selection to a personalized confirmation.
 
 ## Getting started
 
-Requires Node.js 22.13 or newer.
+Requires Node.js 22.
 
 ```bash
 npm install
