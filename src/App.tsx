@@ -29,7 +29,7 @@ const noReplies = [
   "Lol, nice try 😏",
   "Aww, you’re funny 😂",
   "Still trying? 👀",
-  "Nope — catch me! 💨",
+  "Nope, catch me! 💨",
 ];
 
 const timeOptions = [
@@ -418,7 +418,7 @@ function ScheduleContent({
       <header className="schedule-header">
         <p className="eyebrow">One tiny detail</p>
         <h1 id="schedule-title">So… when are you free?</h1>
-        <p>Pick a day, any day — I cleared my schedule.</p>
+        <p>Pick a day, any day. I cleared my schedule.</p>
       </header>
 
       <div className="calendar" aria-label="Choose a date">
@@ -504,7 +504,7 @@ function ScheduleContent({
                 onChange={() => setSelectedTime(time)}
               />
               <span className="time-label">{time}</span>
-              <span className="time-note">— {note}</span>
+              <span className="time-note">· {note}</span>
               <span className="time-check" aria-hidden="true">
                 ♥
               </span>
@@ -650,7 +650,7 @@ function FinalContent({
           I’ll be the happiest person you’ve ever seen <span>✨</span>
         </p>
         <p className="final-subtitle">
-          You can’t cancel btw — the cats have already been informed.
+          You can’t cancel btw. The cats have already been informed.
         </p>
       </header>
 
